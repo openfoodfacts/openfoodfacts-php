@@ -1,0 +1,28 @@
+{
+  "name": "openfoodfacts/php-client",
+  "description": "Open Food Facts API Wrapper, the open database about food.",
+  "homepage": "http://world.openfoodfacts.org/",
+  "type": "library",
+  "minimum-stability": "stable",
+  "license": "MIT",
+  "version": "0.0.1",
+  "support": {
+    "email": "rmorenp@rampamster.org",
+    "issues": "https://github.com/openfoodfacts/openfoodfacts-php/issues",
+    "irc": "http://slack.openfoodfacts.org/",
+    "source": "https://github.com/openfoodfacts/openfoodfacts-php"
+  },
+  "authors": [
+    {
+      "name": "Roberto Moreno",
+      "email": "rmorenp@rampmaster.org",
+      "homepage": "http://www.rampmaster.org",
+      "role": "Wrapper Developer"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "OFF\\": "src/"
+    }
+  }
+}

@@ -6,5 +6,5 @@ PHP wrapper for Open Food Facts
 With Composer:
 
 ```bash
-composer requiere openfoodfacts/php-client
+composer require openfoodfacts/php-client
 ```

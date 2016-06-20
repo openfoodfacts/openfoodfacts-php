@@ -11,4 +11,4 @@ composer require openfoodfacts/php-client
 
 ## Usage
 Is possible using API without Wrapper.
-- Example [Here](./tree/master/examples/00_flat_request)
+- Example [Here](./examples/00_flat_request)

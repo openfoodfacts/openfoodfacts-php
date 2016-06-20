@@ -29,7 +29,7 @@ $brand = $json['product']['brands'];
 ```
 
 ```html
-// Now, in HTML, this is the form with the barcode
+<!-- Now, in HTML, this is the form with the barcode -->
 	<form action="#" method="get">
 		<input type="text" class="form-control" placeholder="barcode" name="ean13">
 		<input type="submit" name="Ok" value="Find this Barcode !">

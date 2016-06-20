@@ -1,5 +1,5 @@
 {
-  "name": "openfoodfacts/php-client",
+  "name": "openfoodfacts/openfoodfacts-php",
   "description": "Open Food Facts API Wrapper, the open database about food.",
   "homepage": "http://world.openfoodfacts.org/",
   "type": "library",

@@ -1,7 +1,7 @@
 {
   "name": "openfoodfacts/openfoodfacts-php",
   "description": "Open Food Facts API Wrapper, the open database about food.",
-  "homepage": "http://world.openfoodfacts.org/",
+  "homepage": "https://world.openfoodfacts.org/",
   "type": "library",
   "minimum-stability": "stable",
   "license": "MIT",
@@ -9,7 +9,7 @@
   "support": {
     "email": "rmorenp@rampamster.org",
     "issues": "https://github.com/openfoodfacts/openfoodfacts-php/issues",
-    "irc": "http://slack.openfoodfacts.org/",
+    "irc": "https://slack.openfoodfacts.org/",
     "source": "https://github.com/openfoodfacts/openfoodfacts-php"
   },
   "authors": [

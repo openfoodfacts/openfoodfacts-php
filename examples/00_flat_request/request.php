@@ -1,11 +1,11 @@
 <?php
 
-//Default parameters by case
-$country = 'fr'; //Country by using OFF
-$productSlug = 'produit'; //Product by language (producto in spanish or product in english)
+// Default parameters by case
+$country = 'fr'; // Country by using OFF
+$productSlug = 'produit'; // Product by language (producto in spanish or product in english)
 
-//Format url
-$url = 'http://{country}.openfoodfacts.org/api/v0/{product}/{scan}.json';
+// Format URL
+$url = 'https://{country}.openfoodfacts.org/api/v0/{product}/{scan}.json';
 
 // Where we will set the value of the scan
 $barcode = (int) $_GET['ean13'];

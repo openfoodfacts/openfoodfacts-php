@@ -1,6 +1,7 @@
 # Created by .ignore support plugin (hsz.mobi)
 ### Example user template template
 ### Example user template
+/build/
 
 # IntelliJ project files
 .idea
@@ -9,8 +10,8 @@ out
 gen### Composer template
 composer.phar
 /vendor/
+/log/
 
 # Commit your application's lock file https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file
 # You may choose to ignore a library lock file https://getcomposer.org/doc/02-libraries.md#lock-file
 # composer.lock
-

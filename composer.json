@@ -3,9 +3,9 @@
   "description": "Open Food Facts API Wrapper, the open database about food.",
   "homepage": "https://world.openfoodfacts.org/",
   "type": "library",
-  "minimum-stability": "stable",
+  "minimum-stability": "beta",
   "license": "MIT",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "support": {
     "email": "rmorenp@rampamster.org",
     "issues": "https://github.com/openfoodfacts/openfoodfacts-php/issues",
@@ -22,7 +22,8 @@
   ],
   "require": {
     "php": ">=7.2",
-    "guzzlehttp/guzzle": "^6.3"
+    "guzzlehttp/guzzle": "^6.3",
+    "psr/log": "^1.0"
   },
   "autoload": {
     "psr-4": {
@@ -31,6 +32,7 @@
   },
   "require-dev": {
     "phpunit/phpunit": "^7.0",
-    "monolog/monolog": "^1.23"
+    "monolog/monolog": "^1.23",
+    "ext-gd": ">=7.2"
   }
 }

@@ -4,7 +4,7 @@ use PHPUnit\Framework\TestCase;
 use OpenFoodFacts\Api;
 use OpenFoodFacts\Collection;
 use OpenFoodFacts\Document;
-use OpenFoodFacts\Document\Product;
+use OpenFoodFacts\Document\FoodProduct;
 use OpenFoodFacts\Exception\{
     ProductNotFoundException,
     BadRequestException
@@ -36,7 +36,7 @@ class ApiFoodTest extends TestCase
 
         $prd = $this->api->getProduct('3057640385148');
 
-        $this->assertEquals(get_class($prd), Product::class);
+        $this->assertEquals(get_class($prd), Document::class);
         $this->assertTrue(isset($prd->product_name));
         $this->assertNotEmpty($prd->product_name);
 

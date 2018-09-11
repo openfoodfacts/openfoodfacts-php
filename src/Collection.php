@@ -13,7 +13,12 @@ class Collection implements \Iterator
     private $skip           = null;
     private $pageSize       = null;
 
-    public function __construct(array $data = null)
+    /**
+     * initilization of the collection
+     * @param array|null $data the raw data
+     * @param string|null $api  this information help to type the collection  (not use yet)
+     */
+    public function __construct(array $data = null, string $api = null)
     {
         $data = $data ?? [
             'products'  => [],
@@ -24,7 +29,7 @@ class Collection implements \Iterator
         ];
         $this->listDocuments = [];
         foreach ($data['products'] as $document) {
-            $this->listDocuments[] = new Document($document);
+            $this->listDocuments[] = new Document($document, $api);
         }
         $this->count    = $data['count'];
         $this->page     = $data['page'];
@@ -32,61 +37,79 @@ class Collection implements \Iterator
         $this->pageSize = $data['page_size'];
     }
 
-
-    public function getCount() : int
-    {
-        return $this->count;
-    }
+    /**
+     * @return int get the current page
+     */
     public function getPage() : int
     {
         return $this->page;
     }
+    /**
+     * @return int get the number of element skipped
+     */
     public function getSkip() : int
     {
         return $this->skip;
     }
+    /**
+     * @return int get the number of element by page for this collection
+     */
     public function getPageSize() : int
     {
         return $this->pageSize;
     }
 
-
-    public function pageCount()
+    /**
+     * @return int the number of element in this Collection
+     */
+    public function pageCount() : int
     {
         return count($this->listDocuments);
     }
 
-    public function searchCount()
+    /**
+     * @return int the number of element for this search
+     */
+    public function searchCount() : int
     {
-        return $this->getCount();
+        return $this->count;
     }
 
     /**
      * Implementation of Iterator
      */
 
-
-
+    /**
+     * @inheritDoc
+     */
     public function rewind()
     {
         reset($this->listDocuments);
     }
-
+    /**
+     * @inheritDoc
+     */
     public function current()
     {
         return current($this->listDocuments);
     }
-
+    /**
+     * @inheritDoc
+     */
     public function key()
     {
         return key($this->listDocuments);
     }
-
+    /**
+     * @inheritDoc
+     */
     public function next()
     {
         return next($this->listDocuments);
     }
-
+    /**
+     * @inheritDoc
+     */
     public function valid()
     {
         $key = key($this->listDocuments);

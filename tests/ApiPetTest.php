@@ -36,7 +36,7 @@ class ApiPetTest extends TestCase
 
         $prd = $this->api->getProduct('7613035799738');
 
-        $this->assertEquals(get_class($prd), Product::class);
+        $this->assertEquals(get_class($prd), Document::class);
         $this->assertTrue(isset($prd->product_name));
         $this->assertNotEmpty($prd->product_name);
 

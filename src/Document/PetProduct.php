@@ -4,7 +4,7 @@ namespace OpenFoodFacts\Document;
 
 use OpenFoodFacts\Document;
 
-class Product extends Document
+class PetProduct extends Document
 {
 
 }

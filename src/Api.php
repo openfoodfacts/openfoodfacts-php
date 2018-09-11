@@ -2,31 +2,73 @@
 
 namespace OpenFoodFacts;
 
-use OpenFoodFacts\Document\Product;
+use OpenFoodFacts\Document;
 use OpenFoodFacts\Collection;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use GuzzleHttp\TransferStats;
 
+/**
+ * this class provide [...]
+ *
+ * It a fork of the python OpenFoodFact rewrite on PHP 7.2
+ */
 class Api
 {
 
+    /**
+     * the httpclient for all http request
+     * @var \GuzzleHttp\Client
+     */
     private $httpClient;
 
+    /**
+     * this property store the current base of the url
+     * @var string
+     */
     private $geoUrl     = 'https://%s.openfoodfacts.org';
+    /**
+     * this property store the current API (it could be : food/beauty/pet )
+     * @var string
+     */
     private $currentAPI = '';
+    /**
+     * This property store the current location for http call
+     *
+     * This property coud be world for all product or you can specify le country code (cc) and
+     * language of the interface (lc). If you want filter on french product you can set fr as country code.
+     * We strongly recommand to use english as language of the interface
+     *
+     * @example fr-en
+     * @link https://en.wiki.openfoodfacts.org/API/Read#Country_code_.28cc.29_and_Language_of_the_interface_.28lc.29
+     * @var string
+     */
     private $geography  = 'world';
-    private $service    = '';
+    /**
+     * this property store the auth parameter (username and password)
+     * @var array
+     */
     private $auth       = null;
-
-    private $cache      = null;
+    /**
+     * this property help you to log intformation
+     * @var LoggerInterface
+     */
     private $logger     = null;
 
+    /**
+     * this constant defines the environments usable by the API
+     * @var array
+     */
     private const LISTAPI = [
       'food'    => 'https://%s.openfoodfacts.org',
       'beauty'  => 'https://%s.openbeautyfacts.org',
       'pet'     => 'https://%s.openpetfoodfacts.org'
     ];
+    /**
+     * This constant defines the facets usable by the API
+     *
+     * This variable is used to create the magic functions like "getIngredients" or "getBrands"
+     * @var array
+     */
     private const FACETS = [
         'additives',
         'allergens',
@@ -50,32 +92,51 @@ class Api
         'traces',
     ];
 
+    /**
+     * This constant defines the extensions authorized for the downloading of the data
+     * @var array
+     */
     private const FILE_TYPE_MAP = [
         "mongodb"   => "openfoodfacts-mongodbdump.tar.gz",
         "csv"       => "en.openfoodfacts.org.products.csv",
         "rdf"       => "en.openfoodfacts.org.products.rdf"
     ];
 
-
+    /**
+     * the constructor of the function
+     *
+     * @param string $api       the environment to search
+     * @param string $geography this parameter represent the the country  code and the interface of the language
+     * @param LoggerInterface $logger    this parameter define an logger
+     */
     public function __construct(string $api = 'food', string $geography = 'world', LoggerInterface $logger = null)
     {
         $this->httpClient   = new \GuzzleHttp\Client();
         $this->logger       = $logger ?? new NullLogger();
 
         //TODO : throw Exception if not found
+        //TODO : add cache interface ?
 
         $this->geoUrl     = sprintf(self::LISTAPI[$api], $geography);
         $this->geography  = $geography;
         $this->currentAPI = $api;
     }
 
-    public function activeTestMode()
+    /**
+     * This function  allows you to perform tests
+     */
+    public function activeTestMode() : void
     {
         $this->geoUrl = 'https://world.openfoodfacts.net';
         $this->authentification('off', 'off');
     }
 
-    public function authentification(string $username, string $password)
+    /**
+     * This function store the authentification parameter
+     * @param  string $username
+     * @param  string $password
+     */
+    public function authentification(string $username, string $password) :void
     {
         $this->auth = [
             'user_id'   => $username,
@@ -83,8 +144,16 @@ class Api
         ];
     }
 
-    public function __call(string $name, $arguments)
+    /**
+     * It's a magic function, it works only for facets
+     * @example getIngredients()
+     * @param  string $name      The name of the function
+     * @param  void $arguments   not use yet (probably needed for ingredients)
+     * @return Collection        The list of all documents found
+     */
+    public function __call(string $name, $arguments) : Collection
     {
+        //TODO : test with argument for ingredient
         if (strpos($name, 'get') === 0) {
             $facet = strtolower(substr($name, 3));
 
@@ -111,13 +180,19 @@ class Api
                     'page_size' => $result['count'],
                 ];
             }
-            return new Collection($result);
+            return new Collection($result, $this->currentAPI);
         }
 
         throw new \Exception('Call to undefined method '.__CLASS__.'::'.$name.'()');
     }
 
-    public function getProduct(string $barcode) : Product
+
+    /**
+     * this fonction search an Document by barcode
+     * @param  string  $barcode the barcode [\d]{13}
+     * @return Document         A Document if found
+     */
+    public function getProduct(string $barcode) : Document
     {
         $url = $this->buildUrl('api', 'product', $barcode);
 
@@ -125,10 +200,16 @@ class Api
         if ($rawResult['status'] === 0) {
             throw new Exception\ProductNotFoundException("Product not found", 1);
         }
-        return new Product($rawResult['product']);
+        return new Document($rawResult['product']);
     }
 
-    public function getByFacets(array $query = [], int $page = 1)
+    /**
+     * This function return a Collection of Document search by facets
+     * @param  array   $query list of facets with value
+     * @param  integer $page  Number of the page
+     * @return Collection     The list of all documents found
+     */
+    public function getByFacets(array $query = [], int $page = 1) : Collection
     {
         if (empty($query)) {
             return new Collection();
@@ -142,10 +223,14 @@ class Api
 
         $url = $this->buildUrl(null, $search, $page);
         $result = $this->fetch($url);
-        return new Collection($result);
+        return new Collection($result, $this->currentAPI);
     }
 
-
+    /**
+     * this function help you to add a new product (or update ??)
+     * @param array $postData The post data
+     * @return bool|string bool if the product has been added or the error message
+     */
     public function addNewProduct(array $postData)
     {
         if (!isset($postData['code']) || !isset($postData['product_name'])) {
@@ -161,6 +246,13 @@ class Api
         return $result['status_verbose'];
     }
 
+    /**
+     * [uploadImage description]
+     * @param  string $code       the barcode of the product
+     * @param  string $imagefield th name of the image
+     * @param  string $img_path   the path of the image
+     * @return array             the http post response (cast in array)
+     */
     public function uploadImage(string $code, string $imagefield, string $img_path)
     {
         //TODO : need test
@@ -184,6 +276,14 @@ class Api
         return $this->fetchPost($url, $postData, true);
     }
 
+    /**
+     * A searc function
+     * @param  string  $search   a search term (fulltext)
+     * @param  integer $page     Number of the page
+     * @param  integer $pageSize The page size
+     * @param  string  $sortBy   the sort
+     * @return Collection        The list of all documents found
+     */
     public function search(string $search, int $page = 1, int $pageSize = 20, string $sortBy = 'unique_scans')
     {
         $parameters = [
@@ -196,30 +296,46 @@ class Api
 
         $url = $this->buildUrl('cgi', 'search.pl', $parameters);
         $result = $this->fetch($url, false);
-        return new Collection($result);
+        return new Collection($result, $this->currentAPI);
     }
 
-
-    public function downloadData(string $file, string $fileType = "mongodb")
+    /**
+     * This function download all data from OpenFoodFact
+     * @param  string $filePath the location where you want to put the stream
+     * @param  string $fileType mongodb/csv/rdf
+     * @return bool             return true when download is complete
+     */
+    public function downloadData(string $filePath, string $fileType = "mongodb")
     {
 
         if (!isset(self::FILE_TYPE_MAP[$fileType])) {
             throw new Exception\BadRequestException('File type not recognized!');
         }
+
         $url        = $this->buildUrl('data', self::FILE_TYPE_MAP[$fileType], []);
-        $response   = $this->httpClient->get($url, ['sink' => $file]);
+        $response   = $this->httpClient->get($url, ['sink' => $filePath]);
 
         $this->logger->info('OpenFoodFact - fetch - GET : ' . $url . ' - ' . $response->getStatusCode());
         return $response->getStatusCode() == 200;
     }
 
-    private function fetch(string $url = null, bool $isJsonFile = true) : array
+
+    /**
+     * This private function do a http request
+     * @param  string  $url        the url to fetch
+     * @param  boolean $isJsonFile the request must be finish by '.json' ?
+     * @return array               return the result of the request in array format
+     */
+    private function fetch(string $url, bool $isJsonFile = true) : array
     {
 
-        $url .= ($isJsonFile? '.json' : '');
+        $url        .= ($isJsonFile? '.json' : '');
+        $realUrl    = $url;
 
         $data = [
-            'on_stats' => function (TransferStats $stats) use (&$realUrl) {
+            'on_stats' => function (\GuzzleHttp\TransferStats $stats) use (&$realUrl) {
+                // this function help to find redirection
+                // On redirect we lost some parameters like page
                 $realUrl= (string)$stats->getEffectiveUri();
             }
         ];
@@ -227,10 +343,7 @@ class Api
             $data['auth'] = array_values($this->auth);
         }
 
-        $realUrl = $url;
-
         $response = $this->httpClient->get($url, $data);
-
         if ($realUrl !== $url) {
             $this->logger->warning('OpenFoodFact - The url : '. $url . ' has been redirect to ' . $realUrl);
             trigger_error('OpenFoodFact - Your request has been redirect');
@@ -239,14 +352,21 @@ class Api
 
         return json_decode($response->getBody(), true);
     }
-    private function fetchPost(string $url = null, array $postData, bool $isMultipart = false) : array
+
+    /**
+     * This function performs the same job of the "fetch" function except the call method and parameters
+     * @param  string  $url         The url to fetch
+     * @param  array   $postData    The post data
+     * @param  boolean $isMultipart The data is multipart ?
+     * @return array               return the result of the request in array format
+     */
+    private function fetchPost(string $url, array $postData, bool $isMultipart = false) : array
     {
         $data = [];
         if ($this->auth) {
             $data['auth'] = array_values($this->auth);
         }
         if ($isMultipart) {
-            //TODO :need test
             foreach ($postData as $key => $value) {
                 $data['multipart'][] = [
                     'name'      => $key,
@@ -264,6 +384,13 @@ class Api
         return json_decode($response->getBody(), true);
     }
 
+    /**
+     * TThis private function generates an url according to the parameters
+     * @param  string|null $service
+     * @param  string|array|null $resourceType
+     * @param  string|array|null $parameters
+     * @return string               the generated url
+     */
     private function buildUrl(string $service = null, $resourceType = null, $parameters = null) : string
     {
         $baseUrl = null;
@@ -278,7 +405,6 @@ class Api
                 ]);
                 break;
             case 'data':
-                //need test
                 $baseUrl = implode('/', [
                   $this->geoUrl,
                   $service,

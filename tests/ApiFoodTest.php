@@ -25,10 +25,8 @@ class ApiFoodTest extends TestCase
         $log->pushHandler(new StreamHandler('log/test.log'));
 
         $this->api = new Api('food','fr-en',$log);
-
-        foreach(glob('tests/tmp/*') as $file){
-            unlink($file);
-        }
+        @rmdir('tests/tmp');
+        @mkdir('tests/tmp');
     }
 
     public function testApi() : void
@@ -54,8 +52,8 @@ class ApiFoodTest extends TestCase
             $this->assertEquals($e->getMessage(),'File type not recognized!');
         }
 
-        $result = $this->api->downloadData('tests/tmp/mongodb');
-        $this->assertTrue(true);
+        // $result = $this->api->downloadData('tests/tmp/mongodb');
+        // $this->assertTrue(true);
     }
 
     public function testApiCollection() : void

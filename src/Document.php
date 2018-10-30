@@ -2,10 +2,6 @@
 
 namespace OpenFoodFacts;
 
-// use OpenFoodFacts\Document\FoodProduct;
-// use OpenFoodFacts\Document\PetProduct;
-// use OpenFoodFacts\Document\BeautyProduct;
-
 /**
  * In mongoDB all element are object, it not possible to define property.
  * All property of the mongodb entity are store in one property of this class and the magic call try to access to it

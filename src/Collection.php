@@ -2,8 +2,6 @@
 
 namespace OpenFoodFacts;
 
-use OpenFoodFacts\Document;
-
 class Collection implements \Iterator
 {
 

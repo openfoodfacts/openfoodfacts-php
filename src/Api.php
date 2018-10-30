@@ -2,8 +2,6 @@
 
 namespace OpenFoodFacts;
 
-use OpenFoodFacts\Document;
-use OpenFoodFacts\Collection;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 

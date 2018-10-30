@@ -18,7 +18,10 @@ composer require openfoodfacts/php-client
 
 ## Usage
 Is possible using API without Wrapper.
-- Example [Here](./examples/00_flat_request)
+```php
+$api = new OpenFoodFacts\Api('food','fr-en',$log);
+$prd = $api->getProduct('3057640385148');
+```
 
 ## Development
 

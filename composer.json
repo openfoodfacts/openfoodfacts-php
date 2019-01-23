@@ -3,7 +3,7 @@
   "description": "Open Food Facts API Wrapper, the open database about food.",
   "homepage": "https://world.openfoodfacts.org/",
   "type": "library",
-  "minimum-stability": "beta",
+  "minimum-stability": "stable",
   "license": "MIT",
   "version": "0.1.0",
   "support": {

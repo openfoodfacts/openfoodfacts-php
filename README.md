@@ -13,7 +13,7 @@ PHP API Wrapper for [Open Food Facts](https://openfoodfacts.org/), the open data
 With Composer:
 
 ```bash
-composer require openfoodfacts/php-client
+composer require openfoodfacts/openfoodfacts-php
 ```
 
 ## Usage

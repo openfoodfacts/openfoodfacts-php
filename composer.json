@@ -5,11 +5,10 @@
   "type": "library",
   "minimum-stability": "stable",
   "license": "MIT",
-  "version": "0.1.0",
   "support": {
     "email": "rmorenp@rampamster.org",
     "issues": "https://github.com/openfoodfacts/openfoodfacts-php/issues",
-    "irc": "https://slack.openfoodfacts.org/",
+    "chat": "https://slack.openfoodfacts.org/",
     "source": "https://github.com/openfoodfacts/openfoodfacts-php"
   },
   "authors": [

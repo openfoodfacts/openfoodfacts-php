@@ -2,8 +2,17 @@
 
 namespace OpenFoodFacts;
 
+
+use Exception;
+use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
+use GuzzleHttp\TransferStats;
+use OpenFoodFacts\Exception\BadRequestException;
+use OpenFoodFacts\Exception\ProductNotFoundException;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use Psr\SimpleCache\CacheInterface;
+use Psr\SimpleCache\InvalidArgumentException;
 
 /**
  * this class provide [...]
@@ -15,7 +24,7 @@ class Api
 
     /**
      * the httpclient for all http request
-     * @var \GuzzleHttp\Client
+     * @var ClientInterface
      */
     private $httpClient;
 
@@ -32,9 +41,9 @@ class Api
     /**
      * This property store the current location for http call
      *
-     * This property coud be world for all product or you can specify le country code (cc) and
+     * This property could be world for all product or you can specify le country code (cc) and
      * language of the interface (lc). If you want filter on french product you can set fr as country code.
-     * We strongly recommand to use english as language of the interface
+     * We strongly recommend to use english as language of the interface
      *
      * @example fr-en
      * @link https://en.wiki.openfoodfacts.org/API/Read#Country_code_.28cc.29_and_Language_of_the_interface_.28lc.29
@@ -47,7 +56,7 @@ class Api
      */
     private $auth       = null;
     /**
-     * this property help you to log intformation
+     * this property help you to log information
      * @var LoggerInterface
      */
     private $logger     = null;
@@ -103,17 +112,24 @@ class Api
     /**
      * the constructor of the function
      *
-     * @param string $api       the environment to search
+     * @param string $api the environment to search
      * @param string $geography this parameter represent the the country  code and the interface of the language
-     * @param LoggerInterface $logger    this parameter define an logger
+     * @param LoggerInterface $logger this parameter define an logger
+     * @param ClientInterface|null $clientInterface
+     * @param CacheInterface|null $cacheInterface
      */
-    public function __construct(string $api = 'food', string $geography = 'world', LoggerInterface $logger = null)
+    public function __construct(string $api = 'food', string $geography = 'world', LoggerInterface $logger = null, ClientInterface $clientInterface = null, CacheInterface $cacheInterface = null)
     {
-        $this->httpClient   = new \GuzzleHttp\Client();
+        if (empty($cacheInterface)) {
+            $this->httpClient = new Client();
+        } else {
+            $this->httpClient = $clientInterface;
+        }
+
+        $this->cache        = $cacheInterface;
         $this->logger       = $logger ?? new NullLogger();
 
         //TODO : throw Exception if not found
-        //TODO : add cache interface ?
 
         $this->geoUrl     = sprintf(self::LISTAPI[$api], $geography);
         $this->geography  = $geography;
@@ -130,7 +146,7 @@ class Api
     }
 
     /**
-     * This function store the authentification parameter
+     * This function store the authentication parameter
      * @param  string $username
      * @param  string $password
      */
@@ -144,10 +160,11 @@ class Api
 
     /**
      * It's a magic function, it works only for facets
-     * @example getIngredients()
-     * @param  string $name      The name of the function
-     * @param  void $arguments   not use yet (probably needed for ingredients)
+     * @param string $name The name of the function
+     * @param void $arguments not use yet (probably needed for ingredients)
      * @return Collection        The list of all documents found
+     * @throws InvalidArgumentException
+     * @example getIngredients()
      */
     public function __call(string $name, $arguments) : Collection
     {
@@ -181,14 +198,16 @@ class Api
             return new Collection($result, $this->currentAPI);
         }
 
-        throw new \Exception('Call to undefined method '.__CLASS__.'::'.$name.'()');
+        throw new Exception('Call to undefined method '.__CLASS__.'::'.$name.'()');
     }
 
 
     /**
-     * this fonction search an Document by barcode
-     * @param  string  $barcode the barcode [\d]{13}
+     * this function search an Document by barcode
+     * @param string $barcode the barcode [\d]{13}
      * @return Document         A Document if found
+     * @throws InvalidArgumentException
+     * @throws ProductNotFoundException
      */
     public function getProduct(string $barcode) : Document
     {
@@ -196,16 +215,17 @@ class Api
 
         $rawResult = $this->fetch($url);
         if ($rawResult['status'] === 0) {
-            throw new Exception\ProductNotFoundException("Product not found", 1);
+            throw new ProductNotFoundException("Product not found", 1);
         }
         return new Document($rawResult['product']);
     }
 
     /**
      * This function return a Collection of Document search by facets
-     * @param  array   $query list of facets with value
-     * @param  integer $page  Number of the page
+     * @param array $query list of facets with value
+     * @param integer $page Number of the page
      * @return Collection     The list of all documents found
+     * @throws InvalidArgumentException
      */
     public function getByFacets(array $query = [], int $page = 1) : Collection
     {
@@ -228,11 +248,13 @@ class Api
      * this function help you to add a new product (or update ??)
      * @param array $postData The post data
      * @return bool|string bool if the product has been added or the error message
+     * @throws BadRequestException
+     * @throws InvalidArgumentException
      */
     public function addNewProduct(array $postData)
     {
         if (!isset($postData['code']) || !isset($postData['product_name'])) {
-            throw new Exception\BadRequestException('code or product_name not found!');
+            throw new BadRequestException('code or product_name not found!');
         }
 
         $url = $this->buildUrl('cgi', 'product_jqm2.pl', []);
@@ -246,22 +268,24 @@ class Api
 
     /**
      * [uploadImage description]
-     * @param  string $code       the barcode of the product
-     * @param  string $imagefield th name of the image
-     * @param  string $img_path   the path of the image
+     * @param string $code the barcode of the product
+     * @param string $imagefield th name of the image
+     * @param string $img_path the path of the image
      * @return array             the http post response (cast in array)
+     * @throws BadRequestException
+     * @throws InvalidArgumentException
      */
     public function uploadImage(string $code, string $imagefield, string $img_path)
     {
         //TODO : need test
         if ($this->currentAPI !== 'food') {
-            throw new Exception\BadRequestException('not Available yet');
+            throw new BadRequestException('not Available yet');
         }
         if (!in_array($imagefield, ["front", "ingredients", "nutrition"])) {
-            throw new Exception\BadRequestException('Imagefield not valid!');
+            throw new BadRequestException('Imagefield not valid!');
         }
         if (!file_exists($img_path)) {
-            throw new Exception\BadRequestException('Image not found');
+            throw new BadRequestException('Image not found');
         }
 
 
@@ -275,12 +299,13 @@ class Api
     }
 
     /**
-     * A searc function
-     * @param  string  $search   a search term (fulltext)
-     * @param  integer $page     Number of the page
-     * @param  integer $pageSize The page size
-     * @param  string  $sortBy   the sort
+     * A search function
+     * @param string $search a search term (fulltext)
+     * @param integer $page Number of the page
+     * @param integer $pageSize The page size
+     * @param string $sortBy the sort
      * @return Collection        The list of all documents found
+     * @throws InvalidArgumentException
      */
     public function search(string $search, int $page = 1, int $pageSize = 20, string $sortBy = 'unique_scans')
     {
@@ -299,15 +324,16 @@ class Api
 
     /**
      * This function download all data from OpenFoodFact
-     * @param  string $filePath the location where you want to put the stream
-     * @param  string $fileType mongodb/csv/rdf
+     * @param string $filePath the location where you want to put the stream
+     * @param string $fileType mongodb/csv/rdf
      * @return bool             return true when download is complete
+     * @throws BadRequestException
      */
     public function downloadData(string $filePath, string $fileType = "mongodb")
     {
 
         if (!isset(self::FILE_TYPE_MAP[$fileType])) {
-            throw new Exception\BadRequestException('File type not recognized!');
+            throw new BadRequestException('File type not recognized!');
         }
 
         $url        = $this->buildUrl('data', self::FILE_TYPE_MAP[$fileType], []);
@@ -320,18 +346,24 @@ class Api
 
     /**
      * This private function do a http request
-     * @param  string  $url        the url to fetch
-     * @param  boolean $isJsonFile the request must be finish by '.json' ?
+     * @param string $url the url to fetch
+     * @param boolean $isJsonFile the request must be finish by '.json' ?
      * @return array               return the result of the request in array format
+     * @throws InvalidArgumentException
      */
     private function fetch(string $url, bool $isJsonFile = true) : array
     {
 
         $url        .= ($isJsonFile? '.json' : '');
         $realUrl    = $url;
+        $cacheKey   = $realUrl;
+
+        if ($this->hasCache() && $this->cache->has($cacheKey)) {
+            return $this->cache->get($cacheKey);
+        }
 
         $data = [
-            'on_stats' => function (\GuzzleHttp\TransferStats $stats) use (&$realUrl) {
+            'on_stats' => function (TransferStats $stats) use (&$realUrl) {
                 // this function help to find redirection
                 // On redirect we lost some parameters like page
                 $realUrl= (string)$stats->getEffectiveUri();
@@ -348,15 +380,22 @@ class Api
         }
         $this->logger->info('OpenFoodFact - fetch - GET : ' . $url . ' - ' . $response->getStatusCode());
 
-        return json_decode($response->getBody(), true);
+        $jsonResult = json_decode($response->getBody(), true);
+
+        if ($this->hasCache()) {
+            $this->cache->set($cacheKey, $jsonResult);
+        }
+
+        return $jsonResult;
     }
 
     /**
      * This function performs the same job of the "fetch" function except the call method and parameters
-     * @param  string  $url         The url to fetch
-     * @param  array   $postData    The post data
-     * @param  boolean $isMultipart The data is multipart ?
+     * @param string $url The url to fetch
+     * @param array $postData The post data
+     * @param boolean $isMultipart The data is multipart ?
      * @return array               return the result of the request in array format
+     * @throws InvalidArgumentException
      */
     private function fetchPost(string $url, array $postData, bool $isMultipart = false) : array
     {
@@ -375,15 +414,27 @@ class Api
             $data['form_params'] = $postData;
         }
 
+        $cacheKey = $url . md5(json_encode($data));
+
+        if ($this->hasCache() && $this->cache->has($cacheKey)) {
+            return $this->cache->get($cacheKey);
+        }
+
         $response = $this->httpClient->post($url, $data);
 
         $this->logger->info('OpenFoodFact - fetch - GET : ' . $url . ' - ' . $response->getStatusCode());
 
-        return json_decode($response->getBody(), true);
+        $jsonResult = json_decode($response->getBody(), true);
+
+        if ($this->hasCache()) {
+            $this->cache->set($cacheKey, $jsonResult);
+        }
+
+        return $jsonResult;
     }
 
     /**
-     * TThis private function generates an url according to the parameters
+     * This private function generates an url according to the parameters
      * @param  string|null $service
      * @param  string|array|null $resourceType
      * @param  string|array|null $parameters
@@ -437,5 +488,13 @@ class Api
                 break;
         }
         return $baseUrl;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function hasCache(): bool
+    {
+        return !empty($this->cache);
     }
 }

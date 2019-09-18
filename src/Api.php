@@ -129,8 +129,6 @@ class Api
         $this->cache        = $cacheInterface;
         $this->logger       = $logger ?? new NullLogger();
 
-        //TODO : throw Exception if not found
-
         $this->geoUrl     = sprintf(self::LISTAPI[$api], $geography);
         $this->geography  = $geography;
         $this->currentAPI = $api;

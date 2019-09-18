@@ -132,14 +132,9 @@ class Api
         CacheInterface $cacheInterface = null
     )
     {
-        if (empty($cacheInterface)) {
-            $this->httpClient = new Client();
-        } else {
-            $this->httpClient = $clientInterface;
-        }
-
         $this->cache        = $cacheInterface;
         $this->logger       = $logger ?? new NullLogger();
+        $this->httpClient   = $clientInterface ?? new Client();
 
         $this->geoUrl     = sprintf(self::LIST_API[$api], $geography);
         $this->geography  = $geography;

@@ -16,22 +16,46 @@ use OpenFoodFacts\Exception\{
 
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Symfony\Component\Cache\Psr16Cache;
+use Symfony\Component\Console\Logger\ConsoleLogger;
 
-class ApiFoodTest extends TestCase
+class ApiFoodCacheTest extends TestCase
 {
-
     use FilesystemTrait;
 
+    /**
+     * @var Api
+     */
     private $api;
+
 
     protected function setUp()
     {
-        $log = new Logger('name');
-        $log->pushHandler(new StreamHandler('log/test.log'));
-
-        $this->api = new Api('food', 'fr-en', $log);
         @rmdir('tests/tmp');
         @mkdir('tests/tmp');
+        @mkdir('tests/tmp/cache');
+        $log = new Logger('name');
+        $log->pushHandler(new StreamHandler('log/test.log'));
+        $psr6Cache = new FilesystemAdapter(sprintf('testrun_%u', rand(0, 1000)), 10, 'tests/tmp/cache');
+        $cache     = new Psr16Cache($psr6Cache);
+
+        $httpClient = new GuzzleHttp\Client([
+//            "http_errors" => false, // MUST not use as it crashes error handling
+            'Connection' => 'close',
+            CURLOPT_FORBID_REUSE => true,
+            CURLOPT_FRESH_CONNECT => true,
+            'defaults' => [
+                'headers' => [
+                    'CURLOPT_USERAGENT' => 'OFF - PHP - SDK - Unit Test',
+                ],
+            ],
+        ]);
+
+        $api = new Api('food', 'fr-en', $log, $httpClient, $cache);
+        $this->assertInstanceOf(Api::class, $api);
+        $this->api = $api;
+
     }
 
     public function testApi(): void
@@ -93,79 +117,6 @@ class ApiFoodTest extends TestCase
 
     }
 
-    public function testApiAddProduct(): void
-    {
-        $this->api->activeTestMode();
-        try {
-            $prd = $this->api->getProduct('3057640385148');
-            $this->assertInstanceOf(Document::class, $prd);
-        } catch (Exception $exception) {
-            if ($exception->getPrevious() instanceof ServerException && $exception->getPrevious()->getCode() === 503) {
-                $this->markTestSkipped(
-                    'Testing API currently not available.'
-                );
-            }
-        }
-
-        $postData = ['code' => $prd->code, 'product_name' => $prd->product_name];
-
-        $result = $this->api->addNewProduct($postData);
-        $this->assertTrue(is_bool($result));
-
-
-        $postData = ['product_name' => $prd->product_name];
-
-        try {
-            $result = $this->api->addNewProduct($postData);
-            $this->assertTrue(false);
-        } catch (BadRequestException $e) {
-            $this->assertTrue(true);
-        }
-        $postData = ['code' => '', 'product_name' => $prd->product_name];
-        $result   = $this->api->addNewProduct($postData);
-        $this->assertTrue(is_string($result));
-        $this->assertEquals($result, 'no code or invalid code');
-
-    }
-
-    public function testApiAddImage(): void
-    {
-
-        $this->api->activeTestMode();
-        try {
-            $prd = $this->api->getProduct('3057640385148');
-            $this->assertInstanceOf(Collection::class, $prd);
-        } catch (Exception $exception) {
-            if ($exception->getPrevious() instanceof ServerException && $exception->getPrevious()->getCode() === 503) {
-                $this->markTestSkipped(
-                    'Testing API currently not available.'
-                );
-            }
-        }
-
-        try {
-            $this->api->uploadImage('3057640385148', 'fronts', 'nothing');
-            $this->assertTrue(false);
-        } catch (BadRequestException $e) {
-            $this->assertEquals($e->getMessage(), 'ImageField not valid!');
-        }
-        try {
-            $this->api->uploadImage('3057640385148', 'front', 'nothing');
-            $this->assertTrue(false);
-        } catch (BadRequestException $e) {
-            $this->assertEquals($e->getMessage(), 'Image not found');
-        }
-        $file1 = $this->createRandomImage();
-
-        $result = $this->api->uploadImage('3057640385148', 'front', $file1);
-        $this->assertEquals($result['status'], 'status ok');
-        $this->assertTrue(isset($result['imagefield']));
-        $this->assertTrue(isset($result['image']));
-        $this->assertTrue(isset($result['image']['imgid']));
-
-
-    }
-
     public function testApiSearch(): void
     {
 
@@ -213,28 +164,6 @@ class ApiFoodTest extends TestCase
         } catch (\Exception $e) {
             $this->assertTrue(true);
         }
-    }
-
-
-    private function createRandomImage(): string
-    {
-
-        $width  = 400;
-        $height = 200;
-
-        $imageRes = imagecreatetruecolor($width, $height);
-        for ($row = 0; $row <= $height; $row++) {
-            for ($column = 0; $column <= $width; $column++) {
-                $colour = imagecolorallocate($imageRes, mt_rand(0, 255), mt_rand(0, 255), mt_rand(0, 255));
-                imagesetpixel($imageRes, $column, $row, $colour);
-            }
-        }
-        $path = 'tests/tmp/image_' . time() . '.jpg';
-        if (imagejpeg($imageRes, $path)) {
-            return $path;
-        }
-        throw new \Exception("Error Processing Request", 1);
-
     }
 
     protected function tearDown()

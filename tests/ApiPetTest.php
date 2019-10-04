@@ -1,4 +1,6 @@
 <?php
+
+use OpenFoodFacts\FilesystemTrait;
 use PHPUnit\Framework\TestCase;
 
 use OpenFoodFacts\Api;
@@ -17,6 +19,8 @@ use Monolog\Handler\StreamHandler;
 class ApiPetTest extends TestCase
 {
 
+    use FilesystemTrait;
+
     private $api;
 
     protected function setUp()
@@ -24,9 +28,9 @@ class ApiPetTest extends TestCase
         $log = new Logger('name');
         $log->pushHandler(new StreamHandler('log/test.log'));
 
-        $this->api = new Api('pet','fr',$log);
+        $this->api = new Api('pet', 'fr', $log);
 
-        foreach(glob('tests/images/*') as $file){
+        foreach (glob('tests/images/*') as $file) {
             unlink($file);
         }
     }
@@ -45,10 +49,13 @@ class ApiPetTest extends TestCase
     public function testApiAddImage()
     {
         try {
-            $this->api->uploadImage('7613035799738','fronts','nothing');
+            $this->api->uploadImage('7613035799738', 'fronts', 'nothing');
             $this->assertTrue(false);
         } catch (BadRequestException $e) {
-            $this->assertEquals($e->getMessage(),'not Available yet');
+            $this->assertEquals($e->getMessage(), 'not Available yet');
+            $this->markTestSkipped(
+                $e->getMessage()
+            );
         }
 
     }
@@ -56,12 +63,17 @@ class ApiPetTest extends TestCase
     public function testApiSearch()
     {
 
-        $collection = $this->api->search('chat',3,30);
+        $collection = $this->api->search('chat', 3, 30);
 
         $this->assertEquals(get_class($collection), Collection::class);
         $this->assertEquals($collection->pageCount(), 30);
         $this->assertGreaterThan(100, $collection->searchCount());
 
+    }
+
+    protected function tearDown()
+    {
+        $this->recursiveDeleteDirectory('tests/tmp');
     }
 
 }

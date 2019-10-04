@@ -2,7 +2,9 @@
 
 namespace OpenFoodFacts;
 
-class Collection implements \Iterator
+use Iterator;
+
+class Collection implements Iterator
 {
 
     private $listDocuments  = null;
@@ -12,7 +14,7 @@ class Collection implements \Iterator
     private $pageSize       = null;
 
     /**
-     * initilization of the collection
+     * initialization of the collection
      * @param array|null $data the raw data
      * @param string|null $api  this information help to type the collection  (not use yet)
      */

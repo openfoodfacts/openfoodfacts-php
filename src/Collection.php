@@ -29,7 +29,7 @@ class Collection implements Iterator
         ];
         $this->listDocuments = [];
         foreach ($data['products'] as $document) {
-            $this->listDocuments[] = new Document($document, $api);
+            $this->listDocuments[] = $this->createSpecificDocument($this->currentAPI, $rawResult['product']);Document($document, $api);
         }
         $this->count    = $data['count'];
         $this->page     = $data['page'];

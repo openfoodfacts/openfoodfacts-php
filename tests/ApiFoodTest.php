@@ -7,6 +7,7 @@ use PHPUnit\Framework\TestCase;
 use OpenFoodFacts\Api;
 use OpenFoodFacts\Collection;
 use OpenFoodFacts\Document\FoodProduct;
+use OpenFoodFacts\Document;
 use OpenFoodFacts\Exception\{
     ProductNotFoundException,
     BadRequestException

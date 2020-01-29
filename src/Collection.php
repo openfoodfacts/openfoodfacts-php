@@ -28,13 +28,45 @@ class Collection implements Iterator
             'page_size' => 0,
         ];
         $this->listDocuments = [];
-        foreach ($data['products'] as $document) {
-            $this->listDocuments[] = $this->createSpecificDocument($this->currentAPI, $rawResult['product']);Document($document, $api);
+
+        if (!empty($data['products'])) {
+            $currentApi = '';
+            if (null !== $api) {
+                $currentApi = $api;
+            }
+            foreach ($data['products'] as $document) {
+                $this->listDocuments[] = $this->createSpecificDocument($currentApi, $document);
+            }
         }
+
         $this->count    = $data['count'];
         $this->page     = $data['page'];
         $this->skip     = $data['skip'];
         $this->pageSize = $data['page_size'];
+    }
+
+    /**
+     * @param string $apiIdentifier
+     * @param array $data
+     * @return Document
+     */
+    protected function createSpecificDocument(string $apiIdentifier, array $data): Document
+    {
+        if ($apiIdentifier === '') {
+            return new Document($data);
+        }
+
+        $className = "OpenFoodFacts\Document\\" . ucfirst($apiIdentifier) . 'Product';
+
+        if (class_exists($className) && is_subclass_of($className, Document::class)) {
+            return new $className($data);
+        } else {
+            $this->logger->error(
+                sprintf('Tried to instanciate "%s", but could not find class or class is not extending %s - Returning: %s', $className, Document::class, Document::class)
+            );
+        }
+
+        return new Document($data);
     }
 
     /**

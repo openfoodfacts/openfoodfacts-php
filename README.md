@@ -20,7 +20,7 @@ composer require openfoodfacts/openfoodfacts-php
 This is the most basic way of creating the API:
 ```php
 $api = new OpenFoodFacts\Api('food','fr');
-$prd = $api->getProduct('3057640385148');
+$product = $api->getProduct('3057640385148');
 ```
 In the example above you access the "food" database, limited to the French language/country scope. 
 The first parameter is either 
@@ -35,6 +35,18 @@ The second parameter decides the language/country scope of the chosen database: 
 For more details on this topic: see the [API Documentation](https://en.wiki.openfoodfacts.org/API/Read#Countries_and_Language_of_the_Response)
 
 These are all the parameters you really need for basic usage.
+
+As return types for ```$api->getProduct``` you get an ```Document::class``` Object. 
+This may also be an Object of Type  ```FoodProduct::class```,```PetProduct::class```, ```BeautyProduct::class``` depending on which API you are creating.
+These objects inherit from the more generic ```Document::class```
+
+In the example above, we use the 'food' API and there will get a ```FoodProduct::class```
+
+For getting a first overview the ```Document::class``` has a function to return an array representation(sorted) for a first start. 
+```php
+$product = $api->getProduct('3057640385148');
+$productDataAsArray = $product->getData();
+```
 
 
 #### Optional Parameters

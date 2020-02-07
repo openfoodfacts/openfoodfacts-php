@@ -37,8 +37,10 @@ For more details on this topic: see the [API Documentation](https://en.wiki.open
 These are all the parameters you really need for basic usage.
 
 
-##### Optional Parameters
+#### Optional Parameters
 The other parameters are optional and for a more sophisticated use of the api (from a software development point of view):
+
+An example in code is found here: [cached_example.php](examples/01-basic_api_usage/cached_example.php)
 
 LoggerInterface: A logger which decieds where to log errors to (file, console , etc) 
 
@@ -51,6 +53,7 @@ see: [Guzzle HTTP Client](https://packagist.org/packages/guzzlehttp/guzzle)
 CacheInterface: To temporarily save the results of API request to improve the performance and to reduce the load on the API- Server 
 
 see: [PSR-16 Simple Cache](https://www.php-fig.org/psr/psr-16/)
+
 ## Development
 
 

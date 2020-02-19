@@ -56,14 +56,10 @@ class Collection implements Iterator
             return new Document($data);
         }
 
-        $className = "OpenFoodFacts\Document\\" . ucfirst($apiIdentifier) . 'Product';
+        $className = "OpenFoodFacts\Document\\" . ucfirst($apiIdentifier) . 'Document';
 
         if (class_exists($className) && is_subclass_of($className, Document::class)) {
             return new $className($data);
-        } else {
-            $this->logger->error(
-                sprintf('Tried to instanciate "%s", but could not find class or class is not extending %s - Returning: %s', $className, Document::class, Document::class)
-            );
         }
 
         return new Document($data);

@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 
 use OpenFoodFacts\Api;
 use OpenFoodFacts\Collection;
-use OpenFoodFacts\Document\FoodProduct;
+use OpenFoodFacts\Document\FoodDocument;
 use OpenFoodFacts\Document;
 use OpenFoodFacts\Exception\{
     ProductNotFoundException,
@@ -39,7 +39,7 @@ class ApiFoodTest extends TestCase
 
         $prd = $this->api->getProduct('3057640385148');
 
-        $this->assertInstanceOf(FoodProduct::class, $prd);
+        $this->assertInstanceOf(FoodDocument::class, $prd);
         $this->assertInstanceOf(Document::class, $prd);
         $this->assertTrue(isset($prd->product_name));
         $this->assertNotEmpty($prd->product_name);
@@ -88,7 +88,7 @@ class ApiFoodTest extends TestCase
             if ($key > 1) {
                 break;
             }
-            $this->assertInstanceOf(FoodProduct::class, $doc);
+            $this->assertInstanceOf(FoodDocument::class, $doc);
             $this->assertInstanceOf(Document::class, $doc);
 
         }
@@ -100,7 +100,7 @@ class ApiFoodTest extends TestCase
         $this->api->activeTestMode();
         try {
             $prd = $this->api->getProduct('3057640385148');
-            $this->assertInstanceOf(FoodProduct::class, $prd);
+            $this->assertInstanceOf(FoodDocument::class, $prd);
             $this->assertInstanceOf(Document::class, $prd);
         } catch (Exception $exception) {
             if ($exception->getPrevious() instanceof ServerException && $exception->getPrevious()->getCode() === 503) {

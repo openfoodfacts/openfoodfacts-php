@@ -5,7 +5,7 @@ use PHPUnit\Framework\TestCase;
 
 use OpenFoodFacts\Api;
 use OpenFoodFacts\Collection;
-use OpenFoodFacts\Document\PetProduct;
+use OpenFoodFacts\Document\PetDocument;
 use OpenFoodFacts\Document;
 use OpenFoodFacts\Exception\{
     ProductNotFoundException,
@@ -40,7 +40,7 @@ class ApiPetTest extends TestCase
 
         $prd = $this->api->getProduct('7613035799738');
 
-        $this->assertInstanceOf(PetProduct::class, $prd);
+        $this->assertInstanceOf(PetDocument::class, $prd);
         $this->assertInstanceOf(Document::class, $prd);
         $this->assertTrue(isset($prd->product_name));
         $this->assertNotEmpty($prd->product_name);

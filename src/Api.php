@@ -70,9 +70,10 @@ class Api
      * @var array
      */
     private const LIST_API = [
-      'food'    => 'https://%s.openfoodfacts.org',
-      'beauty'  => 'https://%s.openbeautyfacts.org',
-      'pet'     => 'https://%s.openpetfoodfacts.org'
+        'food'    => 'https://%s.openfoodfacts.org',
+        'beauty'  => 'https://%s.openbeautyfacts.org',
+        'pet'     => 'https://%s.openpetfoodfacts.org',
+        'product' => 'https://%s.openproductsfacts.org',
     ];
 
     /**
@@ -237,7 +238,7 @@ class Api
      */
     protected function createSpecificDocument(string $apiIdentifier, array $data): Document
     {
-        $className = "OpenFoodFacts\Document\\" . ucfirst($apiIdentifier) . 'Product';
+        $className = "OpenFoodFacts\Document\\" . ucfirst($apiIdentifier) . 'Document';
 
         if (class_exists($className) && is_subclass_of($className, Document::class)) {
             return new $className($data);

@@ -35,7 +35,14 @@ class Collection implements Iterator
                 $currentApi = $api;
             }
             foreach ($data['products'] as $document) {
-                $this->listDocuments[] = $this->createSpecificDocument($currentApi, $document);
+                if($document instanceof Document){
+                    $this->listDocuments[] = $document;
+                }elseif (is_array($document)){
+                    $this->listDocuments[] = Document::createSpecificDocument($currentApi, $document);
+                }else {
+                    throw new \InvalidArgumentException(sprintf('Would expect an OpenFoodFacts\Document Interface or Array here. Got: %s', gettype($document)));
+                }
+
             }
         }
 
@@ -43,26 +50,6 @@ class Collection implements Iterator
         $this->page     = $data['page'];
         $this->skip     = $data['skip'];
         $this->pageSize = $data['page_size'];
-    }
-
-    /**
-     * @param string $apiIdentifier
-     * @param array $data
-     * @return Document
-     */
-    protected function createSpecificDocument(string $apiIdentifier, array $data): Document
-    {
-        if ($apiIdentifier === '') {
-            return new Document($data);
-        }
-
-        $className = "OpenFoodFacts\Document\\" . ucfirst($apiIdentifier) . 'Document';
-
-        if (class_exists($className) && is_subclass_of($className, Document::class)) {
-            return new $className($data);
-        }
-
-        return new Document($data);
     }
 
     /**

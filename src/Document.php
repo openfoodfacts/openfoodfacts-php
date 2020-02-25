@@ -58,4 +58,26 @@ class Document
         return $this->data;
     }
 
+    /**
+     * Returns a Document in the type regarding to the API used.
+     * May be a Child of "Document" e.g.: FoodDocument or ProductDocument
+     * @param string $apiIdentifier
+     * @param array  $data
+     * @return Document
+     */
+    public static function createSpecificDocument(string $apiIdentifier, array $data): Document
+    {
+        if ($apiIdentifier === '') {
+            return new Document($data, $apiIdentifier);
+        }
+
+        $className = "OpenFoodFacts\Document\\" . ucfirst($apiIdentifier) . 'Document';
+
+        if (class_exists($className) && is_subclass_of($className, Document::class)) {
+            return new $className($data, $apiIdentifier);
+        }
+
+        return new Document($data, $apiIdentifier);
+    }
+
 }

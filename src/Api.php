@@ -228,27 +228,7 @@ class Api
             throw new ProductNotFoundException("Product not found", 1);
         }
 
-        return $this->createSpecificDocument($this->currentAPI, $rawResult['product']);
-    }
-
-    /**
-     * @param string $apiIdentifier
-     * @param array $data
-     * @return Document
-     */
-    protected function createSpecificDocument(string $apiIdentifier, array $data): Document
-    {
-        $className = "OpenFoodFacts\Document\\" . ucfirst($apiIdentifier) . 'Document';
-
-        if (class_exists($className) && is_subclass_of($className, Document::class)) {
-            return new $className($data);
-        } else {
-            $this->logger->error(
-                sprintf('Tried to instanciate "%s", but could not find class or class is not extending %s - Returning: %s', $className, Document::class, Document::class)
-            );
-        }
-
-        return new Document($data);
+        return Document::createSpecificDocument($this->currentAPI, $rawResult['product']);
     }
 
     /**
@@ -347,7 +327,7 @@ class Api
             'page'          => $page,
             'page_size'     => $pageSize,
             'sort_by'       => $sortBy,
-            'json'          => '1'
+            'json'          => '1',
         ];
 
         $url = $this->buildUrl('cgi', 'search.pl', $parameters);

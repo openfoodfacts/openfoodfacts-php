@@ -5,8 +5,8 @@ use PHPUnit\Framework\TestCase;
 
 use OpenFoodFacts\Api;
 use OpenFoodFacts\Collection;
+use OpenFoodFacts\Document\PetDocument;
 use OpenFoodFacts\Document;
-use OpenFoodFacts\Document\Product;
 use OpenFoodFacts\Exception\{
     ProductNotFoundException,
     BadRequestException
@@ -40,7 +40,8 @@ class ApiPetTest extends TestCase
 
         $prd = $this->api->getProduct('7613035799738');
 
-        $this->assertEquals(get_class($prd), Document::class);
+        $this->assertInstanceOf(PetDocument::class, $prd);
+        $this->assertInstanceOf(Document::class, $prd);
         $this->assertTrue(isset($prd->product_name));
         $this->assertNotEmpty($prd->product_name);
 
@@ -65,7 +66,7 @@ class ApiPetTest extends TestCase
 
         $collection = $this->api->search('chat', 3, 30);
 
-        $this->assertEquals(get_class($collection), Collection::class);
+        $this->assertInstanceOf(Collection::class, $collection);
         $this->assertEquals($collection->pageCount(), 30);
         $this->assertGreaterThan(100, $collection->searchCount());
 

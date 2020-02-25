@@ -3,11 +3,10 @@
 namespace OpenFoodFacts;
 
 
-use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
-use GuzzleHttp\TransferStats;
 use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\TransferStats;
 use OpenFoodFacts\Exception\BadRequestException;
 use OpenFoodFacts\Exception\ProductNotFoundException;
 use Psr\Log\LoggerInterface;
@@ -71,9 +70,10 @@ class Api
      * @var array
      */
     private const LIST_API = [
-      'food'    => 'https://%s.openfoodfacts.org',
-      'beauty'  => 'https://%s.openbeautyfacts.org',
-      'pet'     => 'https://%s.openpetfoodfacts.org'
+        'food'    => 'https://%s.openfoodfacts.org',
+        'beauty'  => 'https://%s.openbeautyfacts.org',
+        'pet'     => 'https://%s.openpetfoodfacts.org',
+        'product' => 'https://%s.openproductsfacts.org',
     ];
 
     /**
@@ -227,7 +227,28 @@ class Api
             //TODO: maybe return null here? (just throw an exception if something really went wrong?
             throw new ProductNotFoundException("Product not found", 1);
         }
-        return new Document($rawResult['product']);
+
+        return $this->createSpecificDocument($this->currentAPI, $rawResult['product']);
+    }
+
+    /**
+     * @param string $apiIdentifier
+     * @param array $data
+     * @return Document
+     */
+    protected function createSpecificDocument(string $apiIdentifier, array $data): Document
+    {
+        $className = "OpenFoodFacts\Document\\" . ucfirst($apiIdentifier) . 'Document';
+
+        if (class_exists($className) && is_subclass_of($className, Document::class)) {
+            return new $className($data);
+        } else {
+            $this->logger->error(
+                sprintf('Tried to instanciate "%s", but could not find class or class is not extending %s - Returning: %s', $className, Document::class, Document::class)
+            );
+        }
+
+        return new Document($data);
     }
 
     /**

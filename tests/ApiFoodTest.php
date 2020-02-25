@@ -6,8 +6,8 @@ use PHPUnit\Framework\TestCase;
 
 use OpenFoodFacts\Api;
 use OpenFoodFacts\Collection;
+use OpenFoodFacts\Document\FoodDocument;
 use OpenFoodFacts\Document;
-use OpenFoodFacts\Document\FoodProduct;
 use OpenFoodFacts\Exception\{
     ProductNotFoundException,
     BadRequestException
@@ -39,7 +39,8 @@ class ApiFoodTest extends TestCase
 
         $prd = $this->api->getProduct('3057640385148');
 
-        $this->assertEquals(get_class($prd), Document::class);
+        $this->assertInstanceOf(FoodDocument::class, $prd);
+        $this->assertInstanceOf(Document::class, $prd);
         $this->assertTrue(isset($prd->product_name));
         $this->assertNotEmpty($prd->product_name);
 
@@ -65,7 +66,7 @@ class ApiFoodTest extends TestCase
     {
 
         $collection = $this->api->getByFacets([]);
-        $this->assertEquals(get_class($collection), Collection::class);
+        $this->assertInstanceOf(Collection::class, $collection);
         $this->assertEquals($collection->pageCount(), 0);
 
         try {
@@ -76,7 +77,7 @@ class ApiFoodTest extends TestCase
         }
 
         $collection = $this->api->getByFacets(['trace' => 'eggs', 'country' => 'france'], 3);
-        $this->assertEquals(get_class($collection), Collection::class);
+        $this->assertInstanceOf(Collection::class, $collection);
         $this->assertEquals($collection->pageCount(), 20);
         $this->assertEquals($collection->getPage(), 3);
         $this->assertEquals($collection->getSkip(), 40);
@@ -87,7 +88,8 @@ class ApiFoodTest extends TestCase
             if ($key > 1) {
                 break;
             }
-            $this->assertEquals(get_class($doc), Document::class);
+            $this->assertInstanceOf(FoodDocument::class, $doc);
+            $this->assertInstanceOf(Document::class, $doc);
 
         }
 
@@ -98,6 +100,7 @@ class ApiFoodTest extends TestCase
         $this->api->activeTestMode();
         try {
             $prd = $this->api->getProduct('3057640385148');
+            $this->assertInstanceOf(FoodDocument::class, $prd);
             $this->assertInstanceOf(Document::class, $prd);
         } catch (Exception $exception) {
             if ($exception->getPrevious() instanceof ServerException && $exception->getPrevious()->getCode() === 503) {
@@ -195,11 +198,11 @@ class ApiFoodTest extends TestCase
         }
 
         $collection = $this->api->getPurchase_places();
-        $this->assertEquals(get_class($collection), Collection::class);
+        $this->assertInstanceOf(Collection::class, $collection);
         $collection = $this->api->getPackaging_codes();
-        $this->assertEquals(get_class($collection), Collection::class);
+        $this->assertInstanceOf(Collection::class, $collection);
         $collection = $this->api->getEntry_dates();
-        $this->assertEquals(get_class($collection), Collection::class);
+        $this->assertInstanceOf(Collection::class, $collection);
 
         try {
             $collection = $this->api->getIngredient();

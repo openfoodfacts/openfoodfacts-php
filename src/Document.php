@@ -8,7 +8,7 @@ namespace OpenFoodFacts;
  */
 class Document
 {
-    use recursiveSortingTrait;
+    use RecursiveSortingTrait;
 
     /**
      * the whole data

@@ -1,5 +1,8 @@
 language: php
 php:
-  - '7.2'
+  - 7.1
+  - 7.2
+  - 7.3
+  - 7.4snapshot
 before_script: composer install --dev
 script: vendor/bin/phpunit

@@ -36,6 +36,6 @@
     "phpunit/phpunit": "^7.0",
     "symfony/cache": "^4.3",
     "monolog/monolog": "^1.23",
-    "ext-gd": ">=7.2"
+    "ext-gd": "*"
   }
 }

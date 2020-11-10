@@ -29,6 +29,7 @@ class Document
      */
     public function __construct(array $data, string $api = null)
     {
+        $this->recursiveSortArray($data);
         $this->data = $data;
         $this->api  = $api;
     }
@@ -54,7 +55,6 @@ class Document
      */
     public function getData(): array
     {
-        $this->recursiveSortArray($this->data);
         return $this->data;
     }
 

@@ -519,7 +519,7 @@ class Api
                 }
                 if ($resourceType == 'ingredients') {
                     //need test
-                    $resourceType = implode('/', ["state",  "complete", $resourceType]);
+                    $resourceType = implode('/', ["state",  "ingredients-completed"]);
                     $parameters   = 1;
                 }
                 $baseUrl = implode('/', array_filter([

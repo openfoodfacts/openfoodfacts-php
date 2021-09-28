@@ -8,7 +8,6 @@ use PHPUnit\Framework\TestCase;
  */
 class DocumentTest extends TestCase
 {
-
     public function testCreateSpecificDocumentMustCreatedADocumentFromEmptyIdentifier()
     {
         $this->assertInstanceOf(Document::class, Document::createSpecificDocument('', []));
@@ -81,7 +80,8 @@ class DocumentTest extends TestCase
         );
     }
 
-    public function testGetDataMustReturnMultilayerArraySorted(){
+    public function testGetDataMustReturnMultilayerArraySorted()
+    {
         $doc = Document::createSpecificDocument(
             '',
             [

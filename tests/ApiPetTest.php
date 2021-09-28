@@ -7,10 +7,8 @@ use OpenFoodFacts\Api;
 use OpenFoodFacts\Collection;
 use OpenFoodFacts\Document\PetDocument;
 use OpenFoodFacts\Document;
-use OpenFoodFacts\Exception\{
-    ProductNotFoundException,
-    BadRequestException
-};
+use OpenFoodFacts\Exception\ProductNotFoundException;
+use OpenFoodFacts\Exception\BadRequestException;
 
 
 use Monolog\Logger;
@@ -18,7 +16,6 @@ use Monolog\Handler\StreamHandler;
 
 class ApiPetTest extends TestCase
 {
-
     use FilesystemTrait;
 
     private $api;
@@ -37,14 +34,12 @@ class ApiPetTest extends TestCase
 
     public function testApi()
     {
-
         $prd = $this->api->getProduct('7613035799738');
 
         $this->assertInstanceOf(PetDocument::class, $prd);
         $this->assertInstanceOf(Document::class, $prd);
         $this->assertTrue(isset($prd->product_name));
         $this->assertNotEmpty($prd->product_name);
-
     }
 
     public function testApiAddImage()
@@ -58,23 +53,19 @@ class ApiPetTest extends TestCase
                 $e->getMessage()
             );
         }
-
     }
 
     public function testApiSearch()
     {
-
         $collection = $this->api->search('chat', 3, 30);
 
         $this->assertInstanceOf(Collection::class, $collection);
         $this->assertEquals($collection->pageCount(), 30);
         $this->assertGreaterThan(100, $collection->searchCount());
-
     }
 
     protected function tearDown()
     {
         $this->recursiveDeleteDirectory('tests/tmp');
     }
-
 }

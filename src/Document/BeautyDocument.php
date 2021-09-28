@@ -6,5 +6,4 @@ use OpenFoodFacts\Document;
 
 class BeautyDocument extends Document
 {
-
 }

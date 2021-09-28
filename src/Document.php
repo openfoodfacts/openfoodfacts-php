@@ -44,7 +44,7 @@ class Document
     /**
      * @inheritDoc
      */
-    public function __isset(string $name):bool
+    public function __isset(string $name): bool
     {
         return isset($this->data[$name]);
     }
@@ -79,5 +79,4 @@ class Document
 
         return new Document($data, $apiIdentifier);
     }
-
 }

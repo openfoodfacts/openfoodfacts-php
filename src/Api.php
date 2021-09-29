@@ -19,6 +19,10 @@ use Psr\SimpleCache\InvalidArgumentException;
  * this class provide [...]
  *
  * It a fork of the python OpenFoodFact rewrite on PHP 7.2
+ * @method getIngredients() Collection
+ * @method getPurchase_places() Collection
+ * @method getPackaging_codes() Collection
+ * @method getEntry_dates() Collection
  */
 class Api
 {
@@ -64,6 +68,12 @@ class Api
      * @var LoggerInterface
      */
     private $logger     = null;
+
+
+    /**
+     * @var CacheInterface|null
+     */
+    private $cache;
 
     /**
      * this constant defines the environments usable by the API
@@ -148,6 +158,11 @@ class Api
     {
         $this->geoUrl = 'https://world.openfoodfacts.net';
         $this->authentification('off', 'off');
+    }
+
+    public function getCurrentApi(): string
+    {
+        return $this->currentAPI;
     }
 
     /**
@@ -410,7 +425,6 @@ class Api
         }
         if ($realUrl !== $url) {
             $this->logger->warning('OpenFoodFact - The url : '. $url . ' has been redirect to ' . $realUrl);
-            trigger_error('OpenFoodFact - Your request has been redirect');
         }
         $this->logger->info('OpenFoodFact - fetch - GET : ' . $url . ' - ' . $response->getStatusCode());
 
@@ -478,7 +492,7 @@ class Api
      * This private function generates an url according to the parameters
      * @param  string|null $service
      * @param  string|array|null $resourceType
-     * @param  string|array|null $parameters
+     * @param  integer|string|array|null $parameters
      * @return string               the generated url
      */
     private function buildUrl(string $service = null, $resourceType = null, $parameters = null): string
@@ -507,7 +521,7 @@ class Api
                   $service,
                   $resourceType
                 ]);
-                $baseUrl .= '?' . http_build_query($parameters);
+                $baseUrl .= '?' . (is_array($parameters) ? http_build_query($parameters) : $parameters);
                 break;
             case null:
             default:

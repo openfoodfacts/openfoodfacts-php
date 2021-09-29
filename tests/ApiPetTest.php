@@ -1,40 +1,35 @@
 <?php
 
+namespace Tests;
+
 use OpenFoodFacts\FilesystemTrait;
 use PHPUnit\Framework\TestCase;
-
 use OpenFoodFacts\Api;
 use OpenFoodFacts\Collection;
 use OpenFoodFacts\Document\PetDocument;
 use OpenFoodFacts\Document;
-use OpenFoodFacts\Exception\ProductNotFoundException;
 use OpenFoodFacts\Exception\BadRequestException;
-
-
 use Monolog\Logger;
-use Monolog\Handler\StreamHandler;
 
 class ApiPetTest extends TestCase
 {
     use FilesystemTrait;
 
+    /** @var Api */
     private $api;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        $log = new Logger('name');
-        $log->pushHandler(new StreamHandler('log/test.log'));
+        $this->api = new Api('pet', 'fr', $this->createMock(Logger::class));
 
-        $this->api = new Api('pet', 'fr', $log);
-
-        foreach (glob('tests/images/*') as $file) {
+        foreach (glob('tests/images/*') ?: [] as $file) {
             unlink($file);
         }
     }
 
-    public function testApi()
+    public function testApi(): void
     {
-        $prd = $this->api->getProduct('7613035799738');
+        $prd = Helper::getProductWithCache($this->api, '7613035799738');
 
         $this->assertInstanceOf(PetDocument::class, $prd);
         $this->assertInstanceOf(Document::class, $prd);
@@ -42,20 +37,16 @@ class ApiPetTest extends TestCase
         $this->assertNotEmpty($prd->product_name);
     }
 
-    public function testApiAddImage()
+    public function testApiAddImage(): void
     {
-        try {
-            $this->api->uploadImage('7613035799738', 'fronts', 'nothing');
-            $this->assertTrue(false);
-        } catch (BadRequestException $e) {
-            $this->assertEquals($e->getMessage(), 'not Available yet');
-            $this->markTestSkipped(
-                $e->getMessage()
-            );
-        }
+        $this->expectException(BadRequestException::class);
+        $this->expectExceptionMessage('not Available yet');
+        $this->api->uploadImage('7613035799738', 'fronts', 'nothing');
+
+        $this->markTestSkipped('not Available yet');
     }
 
-    public function testApiSearch()
+    public function testApiSearch(): void
     {
         $collection = $this->api->search('chat', 3, 30);
 
@@ -64,7 +55,7 @@ class ApiPetTest extends TestCase
         $this->assertGreaterThan(100, $collection->searchCount());
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->recursiveDeleteDirectory('tests/tmp');
     }

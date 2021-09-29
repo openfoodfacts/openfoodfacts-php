@@ -1,5 +1,7 @@
 <?php
 
+namespace Tests\OpenFoodFacts;
+
 use OpenFoodFacts\Collection;
 use OpenFoodFacts\Document;
 use PHPUnit\Framework\TestCase;
@@ -9,7 +11,7 @@ use PHPUnit\Framework\TestCase;
  */
 class CollectionTest extends TestCase
 {
-    public function testConstructorMustPopulateListDocumentWithExistingDocuments()
+    public function testConstructorMustPopulateListDocumentWithExistingDocuments(): void
     {
         $documents = [
             Document::createSpecificDocument('', []),

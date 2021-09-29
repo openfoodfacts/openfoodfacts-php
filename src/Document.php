@@ -5,6 +5,8 @@ namespace OpenFoodFacts;
 /**
  * In mongoDB all element are object, it not possible to define property.
  * All property of the mongodb entity are store in one property of this class and the magic call try to access to it
+ * @property string $code
+ * @property string $product_name
  */
 class Document
 {
@@ -18,14 +20,14 @@ class Document
 
     /**
      * the whole data
-     * @var array
+     * @var string|null
      */
     private $api;
 
     /**
      * Initialization the document and specify from which API it was extract
      * @param array $data the whole data
-     * @param string $api the api name
+     * @param string|null $api the api name
      */
     public function __construct(array $data, string $api = null)
     {
@@ -36,6 +38,7 @@ class Document
 
     /**
      * @inheritDoc
+     * @return mixed
      */
     public function __get(string $name)
     {

@@ -1,36 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/4.8/phpunit.xsd"
-      backupGlobals="false"
-      colors="true"
-      bootstrap="vendor/autoload.php"
->
-
-    <php>
-        <ini name="error_reporting" value="-1" />
-        <server name="KERNEL_CLASS" value="AppKernel" />
-    </php>
-
-    <testsuites>
-        <testsuite name="AllTests">
-            <directory>tests</directory>
-        </testsuite>
-    </testsuites>
-
-    <filter>
-        <whitelist>
-            <directory>src</directory>
-            <!--<exclude>
-                <directory>src/*Bundle/Resources</directory>
-            </exclude>-->
-        </whitelist>
-    </filter>
-
-    <logging>
-        <log type="coverage-html" target="./build/coverrage" />
-        <log type="coverage-clover" target="./build/logs/clover.xml" />
-        <log type="junit" target="./build/logs/junit.xml" />
-        <log type="testdox-html" target="./build/logstestdox.html" />
-    </logging>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd" backupGlobals="false" colors="true" bootstrap="vendor/autoload.php">
+  <coverage>
+    <include>
+      <directory>src</directory>
+    </include>
+    <report>
+      <clover outputFile="./build/logs/clover.xml"/>
+      <html outputDirectory="./build/coverrage"/>
+    </report>
+  </coverage>
+  <php>
+    <ini name="error_reporting" value="-1"/>
+    <server name="KERNEL_CLASS" value="AppKernel"/>
+  </php>
+  <testsuites>
+    <testsuite name="AllTests">
+      <directory>tests</directory>
+    </testsuite>
+  </testsuites>
+  <logging>
+    <junit outputFile="./build/logs/junit.xml"/>
+    <testdoxHtml outputFile="./build/logstestdox.html"/>
+  </logging>
 </phpunit>

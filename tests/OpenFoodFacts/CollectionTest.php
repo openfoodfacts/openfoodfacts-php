@@ -11,7 +11,6 @@ class CollectionTest extends TestCase
 {
     public function testConstructorMustPopulateListDocumentWithExistingDocuments()
     {
-
         $documents = [
             Document::createSpecificDocument('', []),
             Document::createSpecificDocument('', []),
@@ -27,7 +26,7 @@ class CollectionTest extends TestCase
 
         $this->assertCount(count($documents), $collection);
         $docs = [];
-        foreach($collection as $doc) {
+        foreach ($collection as $doc) {
             $docs[] = $doc;
         }
         $this->assertSame($docs, $documents);

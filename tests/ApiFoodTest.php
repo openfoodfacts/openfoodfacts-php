@@ -8,10 +8,8 @@ use OpenFoodFacts\Api;
 use OpenFoodFacts\Collection;
 use OpenFoodFacts\Document\FoodDocument;
 use OpenFoodFacts\Document;
-use OpenFoodFacts\Exception\{
-    ProductNotFoundException,
-    BadRequestException
-};
+use OpenFoodFacts\Exception\ProductNotFoundException;
+use OpenFoodFacts\Exception\BadRequestException;
 
 
 use Monolog\Logger;
@@ -19,7 +17,6 @@ use Monolog\Handler\StreamHandler;
 
 class ApiFoodTest extends TestCase
 {
-
     use FilesystemTrait;
 
     private $api;
@@ -36,7 +33,6 @@ class ApiFoodTest extends TestCase
 
     public function testApi(): void
     {
-
         $prd = $this->api->getProduct('3057640385148');
 
         $this->assertInstanceOf(FoodDocument::class, $prd);
@@ -64,7 +60,6 @@ class ApiFoodTest extends TestCase
 
     public function testApiCollection(): void
     {
-
         $collection = $this->api->getByFacets([]);
         $this->assertInstanceOf(Collection::class, $collection);
         $this->assertEquals($collection->pageCount(), 0);
@@ -90,9 +85,7 @@ class ApiFoodTest extends TestCase
             }
             $this->assertInstanceOf(FoodDocument::class, $doc);
             $this->assertInstanceOf(Document::class, $doc);
-
         }
-
     }
 
     public function testApiAddProduct(): void
@@ -128,12 +121,10 @@ class ApiFoodTest extends TestCase
         $result   = $this->api->addNewProduct($postData);
         $this->assertTrue(is_string($result));
         $this->assertEquals($result, 'no code or invalid code');
-
     }
 
     public function testApiAddImage(): void
     {
-
         $this->api->activeTestMode();
         try {
             $prd = $this->api->getProduct('3057640385148');
@@ -165,24 +156,19 @@ class ApiFoodTest extends TestCase
         $this->assertTrue(isset($result['imagefield']));
         $this->assertTrue(isset($result['image']));
         $this->assertTrue(isset($result['image']['imgid']));
-
-
     }
 
     public function testApiSearch(): void
     {
-
         $collection = $this->api->search('volvic', 3, 30);
         $this->assertInstanceOf(Collection::class, $collection);
         $this->assertEquals($collection->pageCount(), 30);
         $this->assertGreaterThan(100, $collection->searchCount());
-
     }
 
 
     public function testFacets(): void
     {
-
         $collection = $this->api->getIngredients();
         $this->assertInstanceOf(Collection::class, $collection);
         $this->assertEquals($collection->pageCount(), 20);
@@ -221,7 +207,6 @@ class ApiFoodTest extends TestCase
 
     private function createRandomImage(): string
     {
-
         $width  = 400;
         $height = 200;
 
@@ -237,12 +222,10 @@ class ApiFoodTest extends TestCase
             return $path;
         }
         throw new \Exception("Error Processing Request", 1);
-
     }
 
     protected function tearDown()
     {
         $this->recursiveDeleteDirectory('tests/tmp');
     }
-
 }

@@ -8,10 +8,8 @@ use OpenFoodFacts\Api;
 use OpenFoodFacts\Collection;
 use OpenFoodFacts\Document\FoodDocument;
 use OpenFoodFacts\Document;
-use OpenFoodFacts\Exception\{
-    ProductNotFoundException,
-    BadRequestException
-};
+use OpenFoodFacts\Exception\ProductNotFoundException;
+use OpenFoodFacts\Exception\BadRequestException;
 
 
 use Monolog\Logger;
@@ -55,12 +53,10 @@ class ApiFoodCacheTest extends TestCase
         $api = new Api('food', 'fr-en', $log, $httpClient, $cache);
         $this->assertInstanceOf(Api::class, $api);
         $this->api = $api;
-
     }
 
     public function testApi(): void
     {
-
         $prd = $this->api->getProduct('3057640385148');
 
         $this->assertInstanceOf(FoodDocument::class, $prd);
@@ -89,7 +85,6 @@ class ApiFoodCacheTest extends TestCase
 
     public function testApiCollection(): void
     {
-
         $collection = $this->api->getByFacets([]);
         $this->assertInstanceOf(Collection::class, $collection);
         $this->assertEquals($collection->pageCount(), 0);
@@ -116,25 +111,20 @@ class ApiFoodCacheTest extends TestCase
 
             $this->assertInstanceOf(FoodDocument::class, $doc);
             $this->assertInstanceOf(Document::class, $doc);
-
         }
-
     }
 
     public function testApiSearch(): void
     {
-
         $collection = $this->api->search('volvic', 3, 30);
         $this->assertInstanceOf(Collection::class, $collection);
         $this->assertEquals($collection->pageCount(), 30);
         $this->assertGreaterThan(100, $collection->searchCount());
-
     }
 
 
     public function testFacets(): void
     {
-
         $collection = $this->api->getIngredients();
         $this->assertInstanceOf(Collection::class, $collection);
         $this->assertEquals($collection->pageCount(), 20);
@@ -174,5 +164,4 @@ class ApiFoodCacheTest extends TestCase
     {
         $this->recursiveDeleteDirectory('tests/tmp');
     }
-
 }

@@ -14,6 +14,13 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+      - uses: actions/cache@v2
+        id: cache-db
+        with:
+          path: ~/.symfony/cache
+          key: db
+      - name: check dependancy
+        uses: symfonycorp/security-checker-action@v2
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\OpenFoodFacts;
+namespace OpenFoodFactsTests\OpenFoodFacts;
 
 use OpenFoodFacts\Document;
 use PHPUnit\Framework\TestCase;

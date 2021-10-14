@@ -21,7 +21,7 @@
     }
   ],
   "require": {
-    "php": "^7.1|^8.0",
+    "php": "^7.2|^8.0",
     "ext-json": "*",
     "ext-curl": "*",
     "guzzlehttp/guzzle": "^6.3|^7.0",
@@ -31,14 +31,14 @@
   "autoload": {
     "psr-4": {
       "OpenFoodFacts\\": "src/",
-      "Tests\\": "tests/"
+      "OpenFoodFactsTests\\": "tests/"
     }
   },
   "require-dev": {
     "ext-gd": "*",
     "monolog/monolog": "^1.23",
     "symfony/cache": "^4.3",
-    "phpunit/phpunit": "^9.5",
+    "phpunit/phpunit": "^8.5|^9.5",
     "phpstan/phpstan": "^0.12.99",
     "phpstan/phpstan-phpunit": "^0.12.22",
     "friendsofphp/php-cs-fixer": "^3.1"

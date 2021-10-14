@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests;
+namespace OpenFoodFactsTests;
 
 use OpenFoodFacts\FilesystemTrait;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -139,10 +139,22 @@ class ApiFoodTest extends TestCase
         $file1 = $this->createRandomImage();
 
         $result = $this->api->uploadImage('3057640385148', 'front', $file1);
-        $this->assertEquals($result['status'], 'status ok');
-        $this->assertTrue(isset($result['imagefield']));
-        $this->assertTrue(isset($result['image']));
-        $this->assertTrue(isset($result['image']['imgid']));
+        $this->assertArrayHasKey('status', $result);
+        if ($result['status'] === 'status ok') {
+            $this->assertEquals($result['status'], 'status ok');
+            $this->assertTrue(isset($result['imagefield']));
+            $this->assertTrue(isset($result['image']));
+            $this->assertTrue(isset($result['image']['imgid']));
+        } else {
+            $this->assertEquals($result['status'], 'status not ok');
+            $this->assertArrayHasKey('imgid', $result);
+            $this->assertArrayHasKey('debug', $result);
+            $this->assertStringContainsString($result['debug'], 'product_id: 3057640385148 - user_id:  - imagefield: front_fr - we have already received an image with this file size: ');
+            $this->assertArrayHasKey('error', $result);
+            $this->assertSame($result['error'], 'This picture has already been sent.');
+
+            $this->addWarning('Impossible to verify the upload image');
+        }
     }
 
     public function testApiSearch(): void
@@ -173,8 +185,9 @@ class ApiFoodTest extends TestCase
 
     private function createRandomImage(): string
     {
-        $width  = 400;
-        $height = 200;
+        //more entropy
+        $width  = mt_rand(400, 500);
+        $height = mt_rand(200, 300);
 
         $imageRes = imagecreatetruecolor($width, $height);
         for ($row = 0; $row <= $height; $row++) {

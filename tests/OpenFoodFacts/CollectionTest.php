@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\OpenFoodFacts;
+namespace OpenFoodFactsTests\OpenFoodFacts;
 
 use OpenFoodFacts\Collection;
 use OpenFoodFacts\Document;

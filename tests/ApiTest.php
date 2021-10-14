@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests;
+namespace OpenFoodFactsTests;
 
 use OpenFoodFacts\Api;
 use OpenFoodFacts\Exception\BadRequestException;

@@ -2,7 +2,7 @@
 
 namespace OpenFoodFactsTests;
 
-use OpenFoodFacts\FilesystemTrait;
+use OpenFoodFactsTests\Helper\FilesystemTrait;
 use PHPUnit\Framework\TestCase;
 use OpenFoodFacts\Api;
 use OpenFoodFacts\Collection;

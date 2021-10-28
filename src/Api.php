@@ -28,21 +28,18 @@ class Api
 {
     /**
      * the httpClient for all http request
-     * @var ClientInterface
      */
-    private $httpClient;
+    private ClientInterface $httpClient;
 
     /**
      * this property store the current base of the url
-     * @var string
      */
-    private $geoUrl     = 'https://%s.openfoodfacts.org';
+    private string $geoUrl     = 'https://%s.openfoodfacts.org';
 
     /**
      * this property store the current API (it could be : food/beauty/pet )
-     * @var string
      */
-    private $currentAPI = '';
+    private string $currentAPI = '';
 
     /**
      * This property store the current location for http call
@@ -53,27 +50,20 @@ class Api
      *
      * @example fr-en
      * @link https://en.wiki.openfoodfacts.org/API/Read#Country_code_.28cc.29_and_Language_of_the_interface_.28lc.29
-     * @var string
      */
-    private $geography  = 'world';
+    private string $geography  = 'world';
 
     /**
      * this property store the auth parameter (username and password)
-     * @var array
      */
-    private $auth       = null;
+    private array $auth       = [];
 
     /**
      * this property help you to log information
-     * @var LoggerInterface
      */
-    private $logger     = null;
+    private LoggerInterface $logger;
 
-
-    /**
-     * @var CacheInterface|null
-     */
-    private $cache;
+    private ?CacheInterface $cache;
 
     /**
      * this constant defines the environments usable by the API
@@ -301,7 +291,7 @@ class Api
      * @throws BadRequestException
      * @throws InvalidArgumentException
      */
-    public function uploadImage(string $code, string $imageField, string $imagePath)
+    public function uploadImage(string $code, string $imageField, string $imagePath): array
     {
         //TODO : need test
         if ($this->currentAPI !== 'food') {
@@ -334,7 +324,7 @@ class Api
      * @throws BadRequestException
      * @throws InvalidArgumentException
      */
-    public function search(string $search, int $page = 1, int $pageSize = 20, string $sortBy = 'unique_scans')
+    public function search(string $search, int $page = 1, int $pageSize = 20, string $sortBy = 'unique_scans'): Collection
     {
         $parameters = [
             'search_terms'  => $search,

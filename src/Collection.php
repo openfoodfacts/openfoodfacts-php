@@ -2,15 +2,23 @@
 
 namespace OpenFoodFacts;
 
-use Iterator;
-
-class Collection implements Iterator
+/**
+ * @phpstan-implements \Iterator<number, Document>
+ */
+class Collection implements \Iterator
 {
-    private $listDocuments  = null;
-    private $count          = null;
-    private $page           = null;
-    private $skip           = null;
-    private $pageSize       = null;
+    public const defaultPageSize = 24;
+
+    /** @var array<int, Document> */
+    private $listDocuments  = [];
+    /** @var int */
+    private $count          = 0;
+    /** @var int */
+    private $page           = 0;
+    /** @var int */
+    private $skip           = 0;
+    /** @var int */
+    private $pageSize       = 0;
 
     /**
      * initialization of the collection
@@ -101,6 +109,7 @@ class Collection implements Iterator
     }
     /**
      * @inheritDoc
+     * @return Document|false
      */
     public function current()
     {
@@ -108,6 +117,7 @@ class Collection implements Iterator
     }
     /**
      * @inheritDoc
+     * @return int|null
      */
     public function key()
     {
@@ -115,6 +125,7 @@ class Collection implements Iterator
     }
     /**
      * @inheritDoc
+     * @return Document|false
      */
     public function next()
     {

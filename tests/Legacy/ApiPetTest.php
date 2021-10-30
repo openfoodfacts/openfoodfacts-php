@@ -1,6 +1,6 @@
 <?php
 
-namespace OpenFoodFactsTests;
+namespace OpenFoodFactsTests\Legacy;
 
 use OpenFoodFactsTests\Helper\FilesystemTrait;
 use PHPUnit\Framework\TestCase;

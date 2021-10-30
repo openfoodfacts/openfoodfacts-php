@@ -1,6 +1,6 @@
 <?php
 
-/** @noinspection ALL */
+declare(strict_types=1);
 
 namespace OpenFoodFacts;
 
@@ -8,15 +8,16 @@ use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\TransferStats;
+use OpenFoodFacts\Api\ApiClient;
+use OpenFoodFacts\Api\CgiClient;
+use OpenFoodFacts\Api\DownloadClient;
 use OpenFoodFacts\Exception\BadRequestException;
-use OpenFoodFacts\Exception\ProductNotFoundException;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Psr\SimpleCache\CacheInterface;
 use Psr\SimpleCache\InvalidArgumentException;
 
 /**
- * this class provide [...]
  *
  * It a fork of the python OpenFoodFact rewrite on PHP 7.2
  * @method getIngredients() Collection
@@ -26,6 +27,10 @@ use Psr\SimpleCache\InvalidArgumentException;
  */
 class Api
 {
+    use ApiClient;
+    use DownloadClient;
+    use CgiClient;
+
     /**
      * the httpClient for all http request
      */
@@ -34,12 +39,12 @@ class Api
     /**
      * this property store the current base of the url
      */
-    private string $geoUrl     = 'https://%s.openfoodfacts.org';
+    private string $host     = 'https://%s.openfoodfacts.org';
 
     /**
      * this property store the current API (it could be : food/beauty/pet )
      */
-    private string $currentAPI = '';
+    private string $currentAPI ;
 
     /**
      * This property store the current location for http call
@@ -51,7 +56,7 @@ class Api
      * @example fr-en
      * @link https://en.wiki.openfoodfacts.org/API/Read#Country_code_.28cc.29_and_Language_of_the_interface_.28lc.29
      */
-    private string $geography  = 'world';
+    private string $geography;
 
     /**
      * this property store the auth parameter (username and password)
@@ -74,6 +79,7 @@ class Api
         'beauty'  => 'https://%s.openbeautyfacts.org',
         'pet'     => 'https://%s.openpetfoodfacts.org',
         'product' => 'https://%s.openproductsfacts.org',
+        'test'    => 'https://world.openfoodfacts.net',
     ];
 
     /**
@@ -106,16 +112,6 @@ class Api
     ];
 
     /**
-     * This constant defines the extensions authorized for the downloading of the data
-     * @var array
-     */
-    private const FILE_TYPE_MAP = [
-        "mongodb"   => "openfoodfacts-mongodbdump.tar.gz",
-        "csv"       => "en.openfoodfacts.org.products.csv",
-        "rdf"       => "en.openfoodfacts.org.products.rdf"
-    ];
-
-    /**
      * the constructor of the function
      *
      * @param string $api the environment to search
@@ -128,31 +124,54 @@ class Api
         string $api = 'food',
         string $geography = 'world',
         LoggerInterface $logger = null,
-        ClientInterface $clientInterface = null,
+        ClientInterface $httpClient = null,
         CacheInterface $cacheInterface = null
     ) {
         $this->cache        = $cacheInterface;
         $this->logger       = $logger ?? new NullLogger();
-        $this->httpClient   = $clientInterface ?? new Client();
+        $this->httpClient   = $httpClient ?? new Client();
 
-        $this->geoUrl     = sprintf(self::LIST_API[$api], $geography);
-        $this->geography  = $geography;
+        $this->host      = sprintf(self::LIST_API[$api], $geography);
+        $this->geography = $geography;
         $this->currentAPI = $api;
+        if ($api === 'test') {
+            $this->geography = 'world';
+            $this->currentAPI = 'food';
+            $this->setAuthentication('off', 'off');
+        }
     }
 
-    /**
-     * This function allows you to perform tests
-     * The domain is correct and for testing purposes only
-     */
-    public function activeTestMode(): void
+    protected function getHttpClient(): ClientInterface
     {
-        $this->geoUrl = 'https://world.openfoodfacts.net';
-        $this->authentification('off', 'off');
+        return $this->httpClient;
     }
 
-    public function getCurrentApi(): string
+    protected function requestJson(string $method, $uri, array $options = []): array
+    {
+        try {
+            $response = $this->httpClient->request($method, $uri, $options);
+        } catch (GuzzleException $guzzleException) {
+            $this->logger->warning(sprintf('OpenFoodFact - fetch - failed - %s : %s', $method, $uri), ['exception' => $guzzleException]);
+
+            throw new BadRequestException($guzzleException->getMessage(), $guzzleException->getCode(), $guzzleException);
+        }
+
+        return json_decode($response->getBody()->getContents(), true);
+    }
+
+    protected function getHost(): string
+    {
+        return $this->host;
+    }
+
+    protected function getCurrentApi(): string
     {
         return $this->currentAPI;
+    }
+
+    protected function getAuthentication(): array
+    {
+        return $this->auth;
     }
 
     /**
@@ -160,7 +179,7 @@ class Api
      * @param  string $username
      * @param  string $password
      */
-    public function authentification(string $username, string $password): void
+    public function setAuthentication(string $username, string $password): void
     {
         $this->auth = [
             'user_id'   => $username,
@@ -213,27 +232,6 @@ class Api
         throw new BadRequestException('Call to undefined method '.__CLASS__.'::'.$name.'()');
     }
 
-
-    /**
-     * this function search an Document by barcode
-     * @param string $barcode the barcode [\d]{13}
-     * @return Document         A Document if found
-     * @throws InvalidArgumentException
-     * @throws ProductNotFoundException
-     * @throws BadRequestException
-     */
-    public function getProduct(string $barcode): Document
-    {
-        $url = $this->buildUrl('api', 'product', $barcode);
-
-        $rawResult = $this->fetch($url);
-        if ($rawResult['status'] === 0) {
-            //TODO: maybe return null here? (just throw an exception if something really went wrong?
-            throw new ProductNotFoundException("Product not found", 1);
-        }
-
-        return Document::createSpecificDocument($this->currentAPI, $rawResult['product']);
-    }
 
     /**
      * This function return a Collection of Document search by facets
@@ -346,31 +344,16 @@ class Api
      * @return bool             return true when download is complete
      * @throws BadRequestException
      */
-    public function downloadData(string $filePath, string $fileType = "mongodb")
+    public function downloadData(string $filePath, string $fileType = "mongodb"): bool
     {
-        if (!isset(self::FILE_TYPE_MAP[$fileType])) {
-            $this->logger->warning(
-                'OpenFoodFact - fetch - failed - File type not recognized!',
-                ['fileType' => $fileType, 'availableTypes' => self::FILE_TYPE_MAP]
-            );
-            throw new BadRequestException('File type not recognized!');
-        }
-
-        $url        = $this->buildUrl('data', self::FILE_TYPE_MAP[$fileType]);
         try {
-            $response = $this->httpClient->request('get', $url, ['sink' => $filePath]);
-        } catch (GuzzleException $guzzleException) {
-            $this->logger->warning(sprintf('OpenFoodFact - fetch - failed - GET : %s', $url), ['exception' => $guzzleException]);
-            $exception = new BadRequestException($guzzleException->getMessage(), $guzzleException->getCode(), $guzzleException);
+            return $this->download($filePath, $fileType);
+        } catch (BadRequestException $e) {
+            //@todo: discus on PR => warning or error ?
+            $this->logger->warning('OpenFoodFact - '.$e->getMessage(), ['exception' => $e]);
 
-            throw $exception;
+            throw $e;
         }
-
-        $this->logger->info('OpenFoodFact - fetch - GET : ' . $url . ' - ' . $response->getStatusCode());
-
-        //TODO: validate response here (server may respond with 200 - OK but you might not get valid data as a response)
-
-        return $response->getStatusCode() == 200;
     }
 
 
@@ -418,7 +401,7 @@ class Api
         }
         $this->logger->info('OpenFoodFact - fetch - GET : ' . $url . ' - ' . $response->getStatusCode());
 
-        $jsonResult = json_decode($response->getBody(), true);
+        $jsonResult = json_decode($response->getBody()->getContents(), true);
 
         if (!empty($this->cache) && !empty($jsonResult)) {
             $this->cache->set($cacheKey, $jsonResult);
@@ -491,25 +474,18 @@ class Api
         switch ($service) {
             case 'api':
                 $baseUrl = implode('/', [
-                  $this->geoUrl,
-                  $service,
-                  'v0',
-                  $resourceType,
-                  $parameters
-                ]);
-                break;
-            case 'data':
-                $baseUrl = implode('/', [
-                  $this->geoUrl,
-                  $service,
-                  $resourceType
+                    $this->host,
+                    $service,
+                    'v0',
+                    $resourceType,
+                    $parameters
                 ]);
                 break;
             case 'cgi':
                 $baseUrl = implode('/', [
-                  $this->geoUrl,
-                  $service,
-                  $resourceType
+                    $this->host,
+                    $service,
+                    $resourceType
                 ]);
                 $baseUrl .= '?' . (is_array($parameters) ? http_build_query($parameters) : $parameters);
                 break;
@@ -524,9 +500,9 @@ class Api
                     $parameters   = 1;
                 }
                 $baseUrl = implode('/', array_filter([
-                    $this->geoUrl,
-                    $resourceType,
-                    $parameters
+                                                         $this->host,
+                                                         $resourceType,
+                                                         $parameters
                 ], function ($value) {
                     return !empty($value);
                 }));

@@ -1,6 +1,6 @@
 <?php
 
-namespace OpenFoodFactsTests\OpenFoodFacts;
+namespace OpenFoodFactsTests\Legacy\OpenFoodFacts;
 
 use OpenFoodFacts\Collection;
 use OpenFoodFacts\Document;
@@ -14,8 +14,8 @@ class CollectionTest extends TestCase
     public function testConstructorMustPopulateListDocumentWithExistingDocuments(): void
     {
         $documents = [
-            Document::createSpecificDocument('', []),
-            Document::createSpecificDocument('', []),
+            Document::documentFactory('', []),
+            Document::documentFactory('', []),
         ];
 
         $collection = new Collection([

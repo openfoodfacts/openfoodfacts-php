@@ -41,7 +41,7 @@ class Collection implements \Iterator
                 if ($document instanceof Document) {
                     $this->listDocuments[] = $document;
                 } elseif (is_array($document)) {
-                    $this->listDocuments[] = Document::createSpecificDocument($currentApi, $document);
+                    $this->listDocuments[] = Document::documentFactory($currentApi, $document);
                 } else {
                     throw new \InvalidArgumentException(sprintf('Would expect an OpenFoodFacts\Document Interface or Array here. Got: %s', gettype($document)));
                 }

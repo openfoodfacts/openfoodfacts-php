@@ -1,6 +1,6 @@
 <?php
 
-namespace OpenFoodFactsTests;
+namespace OpenFoodFactsTests\Legacy;
 
 use GuzzleHttp;
 use OpenFoodFactsTests\Helper\FilesystemTrait;

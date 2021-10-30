@@ -1,6 +1,6 @@
 <?php
 
-namespace OpenFoodFactsTests\OpenFoodFacts;
+namespace OpenFoodFactsTests\Legacy\OpenFoodFacts;
 
 use OpenFoodFacts\Document;
 use PHPUnit\Framework\TestCase;
@@ -12,12 +12,12 @@ class DocumentTest extends TestCase
 {
     public function testCreateSpecificDocumentMustCreatedADocumentFromEmptyIdentifier(): void
     {
-        $this->assertInstanceOf(Document::class, Document::createSpecificDocument('', []));
+        $this->assertInstanceOf(Document::class, Document::documentFactory('', []));
     }
 
     public function testCreateSpecificDocumentMustCreatedADocumentFromUnknownIdentifier(): void
     {
-        $this->assertInstanceOf(Document::class, Document::createSpecificDocument('unknown', []));
+        $this->assertInstanceOf(Document::class, Document::documentFactory('unknown', []));
     }
 
     public function testCreateSpecificDocumentFromKnownIdentifiers(): void
@@ -29,20 +29,20 @@ class DocumentTest extends TestCase
             'product' => Document\ProductDocument::class,
         ];
         foreach ($types as $type => $className) {
-            $this->assertInstanceOf($className, Document::createSpecificDocument($type, []));
+            $this->assertInstanceOf($className, Document::documentFactory($type, []));
         }
     }
 
     public function testGetDataMustReturnTheOriginalEmptyArray(): void
     {
-        $doc = Document::createSpecificDocument('', $data = []);
+        $doc = Document::documentFactory('', $data = []);
 
         $this->assertSame($data, $doc->getData());
     }
 
     public function testGetDataMustReturnTheNumericKeysArraySorted(): void
     {
-        $doc = Document::createSpecificDocument(
+        $doc = Document::documentFactory(
             '',
             [
                 1 => 'b',
@@ -63,7 +63,7 @@ class DocumentTest extends TestCase
 
     public function testGetDataMustReturnTheStringKeysArraySorted(): void
     {
-        $doc = Document::createSpecificDocument(
+        $doc = Document::documentFactory(
             '',
             [
                 'b' => 1,
@@ -84,7 +84,7 @@ class DocumentTest extends TestCase
 
     public function testGetDataMustReturnMultilayerArraySorted(): void
     {
-        $doc = Document::createSpecificDocument(
+        $doc = Document::documentFactory(
             '',
             [
                 'b' => 1,
@@ -123,7 +123,7 @@ class DocumentTest extends TestCase
 
     public function testGetDataMustReturnTheSameArray(): void
     {
-        $doc = Document::createSpecificDocument(
+        $doc = Document::documentFactory(
             '',
             $data = [
                 0 => 0,

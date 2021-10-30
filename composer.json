@@ -46,6 +46,7 @@
     "phpunit/phpunit": "^9.5",
     "phpstan/phpstan": "^0.12.99",
     "phpstan/phpstan-phpunit": "^0.12.22",
-    "friendsofphp/php-cs-fixer": "^3.2"
+    "friendsofphp/php-cs-fixer": "^3.2",
+    "symfony/var-dumper": "^5.3"
   }
 }

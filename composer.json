@@ -42,7 +42,7 @@
   "require-dev": {
     "ext-gd": "*",
     "monolog/monolog": "^2.3",
-    "symfony/cache": "^6.0",
+    "symfony/cache": "^5.0|^6.0",
     "phpunit/phpunit": "^9.5",
     "phpstan/phpstan": "^0.12.99",
     "phpstan/phpstan-phpunit": "^0.12.22",

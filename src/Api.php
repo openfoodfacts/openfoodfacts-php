@@ -430,7 +430,7 @@ class Api
 
         $jsonResult = json_decode($response->getBody(), true);
 
-        if (!empty($this->cache) && !empty($jsonResult)) {
+        if (!empty($this->cache) && !empty($jsonResult) && ($jsonResult["status"] ?? 0) !== 0) {
             $this->cache->set($cacheKey, $jsonResult);
         }
 

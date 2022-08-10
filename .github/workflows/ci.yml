@@ -13,6 +13,11 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+      - uses: actions/cache@v2
+        id: cache-db
+        with:
+          path: ~/.symfony/cache
+          key: db
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -31,5 +36,11 @@ jobs:
           restore-keys: ${{ matrix.php }}-composer-
       - name: Install Composer dependencies
         run: composer install --prefer-dist --no-interaction --no-progress --no-suggest
+      - name: check dependancy
+        uses: symfonycorp/security-checker-action@v2
+      - name: Check quality code
+        run: vendor/bin/php-cs-fixer fix --ansi --dry-run --using-cache=no --verbose
+      - name: Execute phpstan
+        run: vendor/bin/phpstan
       - name: Execute tests
         run: vendor/bin/phpunit --verbose

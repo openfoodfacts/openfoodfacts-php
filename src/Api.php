@@ -1,7 +1,8 @@
-<?php /** @noinspection ALL */
+<?php
+
+/** @noinspection ALL */
 
 namespace OpenFoodFacts;
-
 
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
@@ -18,10 +19,13 @@ use Psr\SimpleCache\InvalidArgumentException;
  * this class provide [...]
  *
  * It a fork of the python OpenFoodFact rewrite on PHP 7.2
+ * @method getIngredients() Collection
+ * @method getPurchase_places() Collection
+ * @method getPackaging_codes() Collection
+ * @method getEntry_dates() Collection
  */
 class Api
 {
-
     /**
      * the httpClient for all http request
      * @var ClientInterface
@@ -64,6 +68,12 @@ class Api
      * @var LoggerInterface
      */
     private $logger     = null;
+
+
+    /**
+     * @var CacheInterface|null
+     */
+    private $cache;
 
     /**
      * this constant defines the environments usable by the API
@@ -130,8 +140,7 @@ class Api
         LoggerInterface $logger = null,
         ClientInterface $clientInterface = null,
         CacheInterface $cacheInterface = null
-    )
-    {
+    ) {
         $this->cache        = $cacheInterface;
         $this->logger       = $logger ?? new NullLogger();
         $this->httpClient   = $clientInterface ?? new Client();
@@ -145,10 +154,15 @@ class Api
      * This function allows you to perform tests
      * The domain is correct and for testing purposes only
      */
-    public function activeTestMode() : void
+    public function activeTestMode(): void
     {
         $this->geoUrl = 'https://world.openfoodfacts.net';
         $this->authentification('off', 'off');
+    }
+
+    public function getCurrentApi(): string
+    {
+        return $this->currentAPI;
     }
 
     /**
@@ -156,7 +170,7 @@ class Api
      * @param  string $username
      * @param  string $password
      */
-    public function authentification(string $username, string $password) :void
+    public function authentification(string $username, string $password): void
     {
         $this->auth = [
             'user_id'   => $username,
@@ -173,7 +187,7 @@ class Api
      * @throws BadRequestException
      * @example getIngredients()
      */
-    public function __call(string $name, $arguments) : Collection
+    public function __call(string $name, $arguments): Collection
     {
         //TODO : test with argument for ingredient
         if (strpos($name, 'get') === 0) {
@@ -218,7 +232,7 @@ class Api
      * @throws ProductNotFoundException
      * @throws BadRequestException
      */
-    public function getProduct(string $barcode) : Document
+    public function getProduct(string $barcode): Document
     {
         $url = $this->buildUrl('api', 'product', $barcode);
 
@@ -239,7 +253,7 @@ class Api
      * @throws InvalidArgumentException
      * @throws BadRequestException
      */
-    public function getByFacets(array $query = [], int $page = 1) : Collection
+    public function getByFacets(array $query = [], int $page = 1): Collection
     {
         if (empty($query)) {
             return new Collection();
@@ -344,7 +358,6 @@ class Api
      */
     public function downloadData(string $filePath, string $fileType = "mongodb")
     {
-
         if (!isset(self::FILE_TYPE_MAP[$fileType])) {
             $this->logger->warning(
                 'OpenFoodFact - fetch - failed - File type not recognized!',
@@ -379,10 +392,9 @@ class Api
      * @throws InvalidArgumentException
      * @throws BadRequestException
      */
-    private function fetch(string $url, bool $isJsonFile = true) : array
+    private function fetch(string $url, bool $isJsonFile = true): array
     {
-
-        $url        .= ($isJsonFile? '.json' : '');
+        $url        .= ($isJsonFile ? '.json' : '');
         $realUrl    = $url;
         $cacheKey   = md5($realUrl);
 
@@ -413,7 +425,6 @@ class Api
         }
         if ($realUrl !== $url) {
             $this->logger->warning('OpenFoodFact - The url : '. $url . ' has been redirect to ' . $realUrl);
-            trigger_error('OpenFoodFact - Your request has been redirect');
         }
         $this->logger->info('OpenFoodFact - fetch - GET : ' . $url . ' - ' . $response->getStatusCode());
 
@@ -435,7 +446,7 @@ class Api
      * @throws InvalidArgumentException
      * @throws BadRequestException
      */
-    private function fetchPost(string $url, array $postData, bool $isMultipart = false) : array
+    private function fetchPost(string $url, array $postData, bool $isMultipart = false): array
     {
         $data = [];
         if ($this->auth) {
@@ -460,7 +471,7 @@ class Api
 
         try {
             $response = $this->httpClient->request('post', $url, $data);
-        }catch (GuzzleException $guzzleException){
+        } catch (GuzzleException $guzzleException) {
             $exception = new BadRequestException($guzzleException->getMessage(), $guzzleException->getCode(), $guzzleException);
 
             throw $exception;
@@ -481,10 +492,10 @@ class Api
      * This private function generates an url according to the parameters
      * @param  string|null $service
      * @param  string|array|null $resourceType
-     * @param  string|array|null $parameters
+     * @param  integer|string|array|null $parameters
      * @return string               the generated url
      */
-    private function buildUrl(string $service = null, $resourceType = null, $parameters = null) : string
+    private function buildUrl(string $service = null, $resourceType = null, $parameters = null): string
     {
         $baseUrl = null;
         switch ($service) {
@@ -510,7 +521,7 @@ class Api
                   $service,
                   $resourceType
                 ]);
-                $baseUrl .= '?' . http_build_query($parameters);
+                $baseUrl .= '?' . (is_array($parameters) ? http_build_query($parameters) : $parameters);
                 break;
             case null:
             default:

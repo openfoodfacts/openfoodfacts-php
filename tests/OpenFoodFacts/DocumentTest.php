@@ -1,5 +1,7 @@
 <?php
 
+namespace OpenFoodFactsTests\OpenFoodFacts;
+
 use OpenFoodFacts\Document;
 use PHPUnit\Framework\TestCase;
 
@@ -8,18 +10,17 @@ use PHPUnit\Framework\TestCase;
  */
 class DocumentTest extends TestCase
 {
-
-    public function testCreateSpecificDocumentMustCreatedADocumentFromEmptyIdentifier()
+    public function testCreateSpecificDocumentMustCreatedADocumentFromEmptyIdentifier(): void
     {
         $this->assertInstanceOf(Document::class, Document::createSpecificDocument('', []));
     }
 
-    public function testCreateSpecificDocumentMustCreatedADocumentFromUnknownIdentifier()
+    public function testCreateSpecificDocumentMustCreatedADocumentFromUnknownIdentifier(): void
     {
         $this->assertInstanceOf(Document::class, Document::createSpecificDocument('unknown', []));
     }
 
-    public function testCreateSpecificDocumentFromKnownIdentifiers()
+    public function testCreateSpecificDocumentFromKnownIdentifiers(): void
     {
         $types = [
             'food'    => Document\FoodDocument::class,
@@ -32,14 +33,14 @@ class DocumentTest extends TestCase
         }
     }
 
-    public function testGetDataMustReturnTheOriginalEmptyArray()
+    public function testGetDataMustReturnTheOriginalEmptyArray(): void
     {
         $doc = Document::createSpecificDocument('', $data = []);
 
         $this->assertSame($data, $doc->getData());
     }
 
-    public function testGetDataMustReturnTheNumericKeysArraySorted()
+    public function testGetDataMustReturnTheNumericKeysArraySorted(): void
     {
         $doc = Document::createSpecificDocument(
             '',
@@ -60,7 +61,7 @@ class DocumentTest extends TestCase
         );
     }
 
-    public function testGetDataMustReturnTheStringKeysArraySorted()
+    public function testGetDataMustReturnTheStringKeysArraySorted(): void
     {
         $doc = Document::createSpecificDocument(
             '',
@@ -81,7 +82,8 @@ class DocumentTest extends TestCase
         );
     }
 
-    public function testGetDataMustReturnMultilayerArraySorted(){
+    public function testGetDataMustReturnMultilayerArraySorted(): void
+    {
         $doc = Document::createSpecificDocument(
             '',
             [
@@ -119,7 +121,7 @@ class DocumentTest extends TestCase
         $this->assertSame($expectedArray, $doc->getData());
     }
 
-    public function testGetDataMustReturnTheSameArray()
+    public function testGetDataMustReturnTheSameArray(): void
     {
         $doc = Document::createSpecificDocument(
             '',

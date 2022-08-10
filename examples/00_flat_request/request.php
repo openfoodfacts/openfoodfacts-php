@@ -10,7 +10,7 @@ $url = 'https://{country}.openfoodfacts.org/api/v0/{product}/{scan}.json';
 // Where we will set the value of the scan
 $barcode = (int) $_GET['ean13'];
 
-$url = str_replace(['{country}','{product}','{scan}'],[$country,$productSlug,$barcode],$url);
+$url = str_replace(['{country}','{product}','{scan}'], [$country,$productSlug,$barcode], $url);
 
 // Connection to the API (french version here)
 $result = file_get_contents($url);
@@ -27,5 +27,6 @@ $viewData = file_get_contents('response.html');
 
 echo str_replace(
     ['{productName}','{brand}','{image}','{json}'],
-    [$productName,$brand,$image,print_r($json,true)],
-    $viewData);
+    [$productName,$brand,$image,print_r($json, true)],
+    $viewData
+);

@@ -1,5 +1,7 @@
 <?php
 
+namespace OpenFoodFactsTests\OpenFoodFacts;
+
 use OpenFoodFacts\Collection;
 use OpenFoodFacts\Document;
 use PHPUnit\Framework\TestCase;
@@ -9,9 +11,8 @@ use PHPUnit\Framework\TestCase;
  */
 class CollectionTest extends TestCase
 {
-    public function testConstructorMustPopulateListDocumentWithExistingDocuments()
+    public function testConstructorMustPopulateListDocumentWithExistingDocuments(): void
     {
-
         $documents = [
             Document::createSpecificDocument('', []),
             Document::createSpecificDocument('', []),
@@ -27,7 +28,7 @@ class CollectionTest extends TestCase
 
         $this->assertCount(count($documents), $collection);
         $docs = [];
-        foreach($collection as $doc) {
+        foreach ($collection as $doc) {
             $docs[] = $doc;
         }
         $this->assertSame($docs, $documents);

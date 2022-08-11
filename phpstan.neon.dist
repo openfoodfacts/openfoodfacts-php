@@ -3,10 +3,8 @@ includes:
   - vendor/phpstan/phpstan-phpunit/rules.neon
 
 parameters:
-  level: max
+  level: 8
   checkMissingIterableValueType: false
-  ignoreErrors:
-    - '/.*is not subtype of Throwable/'
   paths:
     - src
     - tests

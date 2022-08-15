@@ -1,5 +1,9 @@
-# openfoodfacts-php
-![Open Food Facts](https://static.openfoodfacts.org/images/misc/openfoodfacts-logo-en-178x150.png)
+# openfoodfacts-php - Official PHP package for Open Food Facts
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://static.openfoodfacts.org/images/logos/off-logo-horizontal-dark.png?refresh_github_cache=1">
+  <source media="(prefers-color-scheme: light)" srcset="https://static.openfoodfacts.org/images/logos/off-logo-horizontal-light.png?refresh_github_cache=1">
+  <img height="48" src="https://static.openfoodfacts.org/images/logos/off-logo-horizontal-light.svg">
+</picture>
 
 PHP API Wrapper for [Open Food Facts](https://openfoodfacts.org/), the open database about food.
 

@@ -321,7 +321,14 @@ class Api
             'imagefield'                => $imageField,
             'imgupload_' . $imageField  => fopen($imagePath, 'r')
         ];
-        return $this->fetchPost($url, $postData, true);
+
+        try {
+            return $this->fetchPost($url, $postData, true);
+        } catch (\Exception $e) {
+            fclose($postData['imgupload_' . $imageField]);
+
+            throw $e;
+        }
     }
 
     /**

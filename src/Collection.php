@@ -111,7 +111,7 @@ class Collection implements \Iterator
      * @inheritDoc
      * @return Document|false
      */
-    public function current()
+    public function current(): mixed
     {
         return current($this->listDocuments);
     }
@@ -119,7 +119,7 @@ class Collection implements \Iterator
      * @inheritDoc
      * @return int|null
      */
-    public function key()
+    public function key(): mixed
     {
         return key($this->listDocuments);
     }

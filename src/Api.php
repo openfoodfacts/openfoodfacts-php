@@ -324,10 +324,10 @@ class Api
 
         try {
             return $this->fetchPost($url, $postData, true);
-        } catch (\Exception $e) {
-            fclose($postData['imgupload_' . $imageField]);
-
-            throw $e;
+        } finally {
+            if (is_resource($postData['imgupload_' . $imageField])) {
+                fclose($postData['imgupload_' . $imageField]);
+            }
         }
     }
 

@@ -39,8 +39,8 @@
     "monolog/monolog": "^2.8",
     "symfony/cache": "^6.0",
     "phpunit/phpunit": "^8.5|^9.5",
-    "phpstan/phpstan": "^0.12.99",
-    "phpstan/phpstan-phpunit": "^0.12.22",
+    "phpstan/phpstan": "^1.8.2",
+    "phpstan/phpstan-phpunit": "^1.1.1",
     "friendsofphp/php-cs-fixer": "^3.1"
   }
 }

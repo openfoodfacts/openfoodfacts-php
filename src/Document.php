@@ -22,6 +22,7 @@ class Document
      * the whole data
      * @var string|null
      */
+    /** @phpstan-ignore-next-line */
     private $api;
 
     /**

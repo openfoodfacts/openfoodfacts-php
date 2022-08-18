@@ -45,6 +45,20 @@ class Api
     private $currentAPI = '';
 
     /**
+     * This property store the current location for http call
+     *
+     * This property could be world for all product or you can specify le country code (cc) and
+     * language of the interface (lc). If you want filter on french product you can set fr as country code.
+     * We strongly recommend to use english as language of the interface
+     *
+     * @example fr-en
+     * @link https://en.wiki.openfoodfacts.org/API/Read#Country_code_.28cc.29_and_Language_of_the_interface_.28lc.29
+     * @var string
+     */
+    /** @phpstan-ignore-next-line */
+    private $geography  = 'world';
+
+    /**
      * this property store the auth parameter (username and password)
      * @var array
      */
@@ -133,6 +147,7 @@ class Api
         $this->httpClient   = $clientInterface ?? new Client();
 
         $this->geoUrl     = sprintf(self::LIST_API[$api], $geography);
+        $this->geography  = $geography;
         $this->currentAPI = $api;
     }
 
@@ -393,7 +408,7 @@ class Api
 
         if (!empty($this->cache) && $this->cache->has($cacheKey)) {
             $cachedResult = $this->cache->get($cacheKey);
-            return $cachedResult;
+            return (array)$cachedResult;
         }
 
         $data = [
@@ -427,7 +442,7 @@ class Api
             $this->cache->set($cacheKey, $jsonResult);
         }
 
-        return $jsonResult;
+        return (array)$jsonResult;
     }
 
     /**
@@ -459,7 +474,7 @@ class Api
         $cacheKey = md5($url . json_encode($data));
 
         if (!empty($this->cache) && $this->cache->has($cacheKey)) {
-            return $this->cache->get($cacheKey);
+            return (array)$this->cache->get($cacheKey);
         }
 
         try {
@@ -478,7 +493,7 @@ class Api
             $this->cache->set($cacheKey, $jsonResult);
         }
 
-        return $jsonResult;
+        return (array)$jsonResult;
     }
 
     /**
@@ -493,15 +508,17 @@ class Api
         $baseUrl = null;
         switch ($service) {
             case 'api':
+                /** @phpstan-ignore-next-line */
                 $baseUrl = implode('/', [
-                  $this->geoUrl,
-                  $service,
-                  'v0',
-                  $resourceType,
-                  $parameters
+                    $this->geoUrl,
+                    $service,
+                    'v0',
+                    $resourceType,
+                    $parameters
                 ]);
                 break;
             case 'data':
+                /** @phpstan-ignore-next-line */
                 $baseUrl = implode('/', [
                   $this->geoUrl,
                   $service,
@@ -509,6 +526,7 @@ class Api
                 ]);
                 break;
             case 'cgi':
+                /** @phpstan-ignore-next-line */
                 $baseUrl = implode('/', [
                   $this->geoUrl,
                   $service,
@@ -526,6 +544,7 @@ class Api
                     $resourceType = implode('/', ["state",  "ingredients-completed"]);
                     $parameters   = 1;
                 }
+                /** @phpstan-ignore-next-line */
                 $baseUrl = implode('/', array_filter([
                     $this->geoUrl,
                     $resourceType,

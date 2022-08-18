@@ -45,19 +45,6 @@ class Api
     private $currentAPI = '';
 
     /**
-     * This property store the current location for http call
-     *
-     * This property could be world for all product or you can specify le country code (cc) and
-     * language of the interface (lc). If you want filter on french product you can set fr as country code.
-     * We strongly recommend to use english as language of the interface
-     *
-     * @example fr-en
-     * @link https://en.wiki.openfoodfacts.org/API/Read#Country_code_.28cc.29_and_Language_of_the_interface_.28lc.29
-     * @var string
-     */
-    private $geography  = 'world';
-
-    /**
      * this property store the auth parameter (username and password)
      * @var array
      */
@@ -146,7 +133,6 @@ class Api
         $this->httpClient   = $clientInterface ?? new Client();
 
         $this->geoUrl     = sprintf(self::LIST_API[$api], $geography);
-        $this->geography  = $geography;
         $this->currentAPI = $api;
     }
 

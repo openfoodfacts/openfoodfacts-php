@@ -103,7 +103,7 @@ class Collection implements \Iterator
     /**
      * @inheritDoc
      */
-    public function rewind()
+    public function rewind(): void
     {
         reset($this->listDocuments);
     }
@@ -125,16 +125,15 @@ class Collection implements \Iterator
     }
     /**
      * @inheritDoc
-     * @return Document|false
      */
-    public function next()
+    public function next(): void
     {
-        return next($this->listDocuments);
+        next($this->listDocuments);
     }
     /**
      * @inheritDoc
      */
-    public function valid()
+    public function valid(): bool
     {
         $key = key($this->listDocuments);
         return ($key !== null && $key !== false);

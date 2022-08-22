@@ -36,7 +36,6 @@
   },
   "require-dev": {
     "ext-gd": "*",
-    "monolog/monolog": "^2.8",
     "symfony/cache": "^6.0",
     "phpunit/phpunit": "^8.5|^9.5",
     "phpstan/phpstan": "^1.8.2",

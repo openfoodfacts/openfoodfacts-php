@@ -11,7 +11,7 @@ use OpenFoodFacts\Document\FoodDocument;
 use OpenFoodFacts\Document;
 use OpenFoodFacts\Exception\ProductNotFoundException;
 use OpenFoodFacts\Exception\BadRequestException;
-use Monolog\Logger;
+use Psr\Log\NullLogger;
 
 class ApiFoodTest extends TestCase
 {
@@ -20,13 +20,13 @@ class ApiFoodTest extends TestCase
     /** @var Api */
     protected $api;
     /**
-     * @var Logger|MockObject
+     * @var NullLogger|MockObject
      */
     protected $log;
 
     protected function setUp(): void
     {
-        $this->log = $this->createMock(Logger::class);
+        $this->log = $this->createMock(NullLogger::class);
 
         $this->api = new Api('food', 'fr-en', $this->log);
         @rmdir('tests/tmp');

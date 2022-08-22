@@ -9,7 +9,7 @@ use OpenFoodFacts\Collection;
 use OpenFoodFacts\Document\PetDocument;
 use OpenFoodFacts\Document;
 use OpenFoodFacts\Exception\BadRequestException;
-use Monolog\Logger;
+use Psr\Log\NullLogger;
 
 class ApiPetTest extends TestCase
 {
@@ -20,7 +20,7 @@ class ApiPetTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->api = new Api('pet', 'fr', $this->createMock(Logger::class));
+        $this->api = new Api('pet', 'fr', $this->createMock(NullLogger::class));
 
         foreach (glob('tests/images/*') ?: [] as $file) {
             unlink($file);

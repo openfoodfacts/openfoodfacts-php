@@ -80,3 +80,8 @@ see: [PSR-16 Simple Cache](https://www.php-fig.org/psr/psr-16/)
 4. Commit your changes (`git commit -am 'Add some feature'`)
 5. Push to the branch (`git push origin my-new-feature`)
 6. Create a new Pull Request
+
+## Third party applications
+If you use this SDK, feel free to open a PR to add your application in this list.
+
+## Authors

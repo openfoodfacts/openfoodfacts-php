@@ -42,10 +42,5 @@
     "phpstan/phpstan": "^0.12.99",
     "phpstan/phpstan-phpunit": "^0.12.22",
     "friendsofphp/php-cs-fixer": "^3.1"
-  },
-  "scripts": {
-    "test": "phpunit",
-    "analyse": "phpstan analyse",
-    "lint": "PHP_CS_FIXER_IGNORE_ENV=1 php-cs-fixer fix --dry-run"
   }
 }

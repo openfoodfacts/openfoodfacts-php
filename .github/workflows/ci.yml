@@ -37,7 +37,7 @@ jobs:
       - name: Install Composer dependencies
         run: composer install --prefer-dist --no-interaction --no-progress --no-suggest
       - name: check dependancy
-        uses: symfonycorp/security-checker-action@v2
+        uses: symfonycorp/security-checker-action@v4
       - name: Check quality code
         run: bin/php-cs-fixer fix --ansi --dry-run --using-cache=no --verbose
       - name: Execute phpstan

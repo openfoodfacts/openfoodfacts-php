@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:experimental
-FROM composer:2 as COMPOSER
+FROM composer:2 AS COMPOSER
 ENV COMPOSER_HOME=/usr/config/composer
 ARG GITHUB_TOKEN
 RUN if [[ -z "$GITHUB_TOKEN" ]] ; then echo Github Token not provided ; else composer config -g github-oauth.github.com $GITHUB_TOKEN; fi

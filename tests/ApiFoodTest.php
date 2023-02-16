@@ -207,7 +207,7 @@ class ApiFoodTest extends TestCase
             return $path;
         }
 
-        throw new \Exception('Error Processing Request', 1);
+        throw new \RuntimeException('Error Processing Request', 1);
     }
 
     protected function tearDown(): void

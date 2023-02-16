@@ -25,12 +25,11 @@
       "role": "PHP Developer"
     }
   ],
-  "config": {
-    "bin-dir": "bin"
-  },
   "require": {
     "php": "^8.1",
     "ext-json": "*",
+    "ext-curl": "*",
+    "ext-gd": "*",
     "guzzlehttp/guzzle": "^7.4",
     "psr/log": "^3.0",
     "psr/simple-cache": "^3.0"
@@ -42,8 +41,6 @@
     }
   },
   "require-dev": {
-    "ext-gd": "*",
-    "ext-curl": "*",
     "symfony/cache": "^6.1.3",
     "phpunit/phpunit": "^9.5.21",
     "phpstan/phpstan": "^1.8.2",

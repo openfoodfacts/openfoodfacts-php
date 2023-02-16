@@ -186,21 +186,21 @@ class ApiFoodTest extends TestCase
     private function createRandomImage(): string
     {
         //more entropy
-        $width  = mt_rand(400, 500);
-        $height = mt_rand(200, 300);
+        $width  = random_int(400, 500);
+        $height = random_int(200, 300);
 
         $imageRes = imagecreatetruecolor($width, $height);
         for ($row = 0; $row <= $height; $row++) {
             for ($column = 0; $column <= $width; $column++) {
                 /** @phpstan-ignore-next-line */
-                $color = imagecolorallocate($imageRes, mt_rand(0, 255), mt_rand(0, 255), mt_rand(0, 255));
+                $color = imagecolorallocate($imageRes, random_int(0, 255), random_int(0, 255), random_int(0, 255));
                 /** @phpstan-ignore-next-line */
                 imagesetpixel($imageRes, $column, $row, $color);
             }
         }
-        $path = 'tests/tmp/image_' . time() . '.jpg';
+        $path = 'tests/tmp/image_' . time() . '.png';
         /** @phpstan-ignore-next-line */
-        if (imagejpeg($imageRes, $path)) {
+        if (imagepng($imageRes, $path)) {
             return $path;
         }
 

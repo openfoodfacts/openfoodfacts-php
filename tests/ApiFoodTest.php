@@ -30,7 +30,7 @@ class ApiFoodTest extends TestCase
 
         $this->api = new Api('food', 'fr-en', $this->log);
         $testFolder       = 'tests/tmp';
-        if(file_exists($testFolder)){
+        if (file_exists($testFolder)) {
             rmdir($testFolder);
         }
         mkdir($testFolder);

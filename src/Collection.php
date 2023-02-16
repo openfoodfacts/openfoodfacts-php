@@ -48,7 +48,7 @@ class Collection implements \Iterator
             }
         }
 
-        $this->count    = $data['count'] ?? 0;
+        $this->count    = $data['count'] ?? NULL;
         $this->page     = $data['page'] ?? 0;
         $this->skip     = $data['skip'] ?? 0;
         $this->pageSize = $data['page_size'] ?? 0;

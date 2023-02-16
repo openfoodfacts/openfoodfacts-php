@@ -10,6 +10,9 @@ php-setup:
 install:
 	docker compose exec php-fpm bash -c 'XDEBUG_MODE=off composer install'
 
+fix:
+	docker compose exec php-fpm bash -c 'XDEBUG_MODE=off ./vendor/bin/php-cs-fixer fix'
+
 test:
 	docker compose exec php-fpm bash -c 'XDEBUG_MODE=off ./vendor/bin/phpunit'
 

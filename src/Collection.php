@@ -11,7 +11,7 @@ class Collection implements \Iterator
 
     /** @var array<int, Document> */
     private array $listDocuments  = [];
-    private ?int $count          = NULL;
+    private ?int $count          = null;
     private int$page           = 0;
     private int$skip           = 0;
     private int $pageSize       = 0;
@@ -48,7 +48,7 @@ class Collection implements \Iterator
             }
         }
 
-        $this->count    = $data['count'] ?? NULL;
+        $this->count    = $data['count'] ?? null;
         $this->page     = $data['page'] ?? 0;
         $this->skip     = $data['skip'] ?? 0;
         $this->pageSize = $data['page_size'] ?? 0;

@@ -16,7 +16,7 @@ class ApiFoodCacheTest extends ApiFoodTest
     {
         parent::setUp();
         $testFolder       = 'tests/tmp';
-        if(file_exists($testFolder)){
+        if (file_exists($testFolder)) {
             rmdir($testFolder);
         }
         mkdir($testFolder);

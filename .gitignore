@@ -2,6 +2,7 @@
 ### Example user template template
 ### Example user template
 /build/
+/bin/
 
 # IntelliJ project files
 .idea

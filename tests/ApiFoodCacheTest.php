@@ -22,7 +22,7 @@ class ApiFoodCacheTest extends ApiFoodTest
         $cache     = new Psr16Cache($psr6Cache);
 
         $httpClient = new GuzzleHttp\Client([
-//            "http_errors" => false, // MUST not use as it crashes error handling
+            // "http_errors" => false, // MUST not use as it crashes error handling
             'Connection' => 'close',
             CURLOPT_FORBID_REUSE => true,
             CURLOPT_FRESH_CONNECT => true,

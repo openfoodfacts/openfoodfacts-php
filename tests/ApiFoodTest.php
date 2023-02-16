@@ -203,7 +203,8 @@ class ApiFoodTest extends TestCase
         if (imagejpeg($imageRes, $path)) {
             return $path;
         }
-        throw new \Exception("Error Processing Request", 1);
+
+        throw new \Exception('Error Processing Request', 1);
     }
 
     protected function tearDown(): void

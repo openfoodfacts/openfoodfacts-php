@@ -15,8 +15,7 @@ class ApiPetTest extends TestCase
 {
     use FilesystemTrait;
 
-    /** @var Api */
-    private $api;
+    private Api $api;
 
     protected function setUp(): void
     {
@@ -51,7 +50,7 @@ class ApiPetTest extends TestCase
         $collection = $this->api->search('chat', 3, 30);
 
         $this->assertInstanceOf(Collection::class, $collection);
-        $this->assertEquals($collection->pageCount(), 30);
+        $this->assertEquals(30, $collection->pageCount());
         $this->assertGreaterThan(100, $collection->searchCount());
     }
 

@@ -10,22 +10,18 @@ class Collection implements \Iterator
     public const defaultPageSize = 24;
 
     /** @var array<int, Document> */
-    private $listDocuments  = [];
-    /** @var int */
-    private $count          = 0;
-    /** @var int */
-    private $page           = 0;
-    /** @var int */
-    private $skip           = 0;
-    /** @var int */
-    private $pageSize       = 0;
+    private array $listDocuments  = [];
+    private int $count          = 0;
+    private int$page           = 0;
+    private int$skip           = 0;
+    private int $pageSize       = 0;
 
     /**
      * initialization of the collection
      * @param array|null $data the raw data
      * @param string|null $api  this information help to type the collection  (not use yet)
      */
-    public function __construct(array $data = null, string $api = null)
+    public function __construct(?array $data = null, ?string $api = null)
     {
         $data = $data ?? [
             'products'  => [],
@@ -109,17 +105,15 @@ class Collection implements \Iterator
     }
     /**
      * @inheritDoc
-     * @return Document|false
      */
-    public function current(): mixed
+    public function current(): Document|false
     {
         return current($this->listDocuments);
     }
     /**
      * @inheritDoc
-     * @return int|null
      */
-    public function key(): mixed
+    public function key(): int|null
     {
         return key($this->listDocuments);
     }
@@ -136,6 +130,7 @@ class Collection implements \Iterator
     public function valid(): bool
     {
         $key = key($this->listDocuments);
+
         return ($key !== null && $key !== false);
     }
 }

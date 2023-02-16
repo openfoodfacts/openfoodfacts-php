@@ -14,27 +14,17 @@ class Document
 
     /**
      * the whole data
-     * @var array
      */
-    private $data;
-
-    /**
-     * the whole data
-     * @var string|null
-     */
-    /** @phpstan-ignore-next-line */
-    private $api;
+    private array $data;
 
     /**
      * Initialization the document and specify from which API it was extract
      * @param array $data the whole data
-     * @param string|null $api the api name
      */
-    public function __construct(array $data, string $api = null)
+    public function __construct(array $data)
     {
         $this->recursiveSortArray($data);
         $this->data = $data;
-        $this->api  = $api;
     }
 
     /**
@@ -72,15 +62,15 @@ class Document
     public static function createSpecificDocument(string $apiIdentifier, array $data): Document
     {
         if ($apiIdentifier === '') {
-            return new Document($data, $apiIdentifier);
+            return new Document($data);
         }
 
         $className = "OpenFoodFacts\Document\\" . ucfirst($apiIdentifier) . 'Document';
 
         if (class_exists($className) && is_subclass_of($className, Document::class)) {
-            return new $className($data, $apiIdentifier);
+            return new $className($data);
         }
 
-        return new Document($data, $apiIdentifier);
+        return new Document($data);
     }
 }

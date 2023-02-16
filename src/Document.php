@@ -2,6 +2,11 @@
 
 namespace OpenFoodFacts;
 
+use OpenFoodFacts\Document\BeautyDocument;
+use OpenFoodFacts\Document\FoodDocument;
+use OpenFoodFacts\Document\PetDocument;
+use OpenFoodFacts\Document\ProductDocument;
+
 /**
  * In mongoDB all element are object, it not possible to define property.
  * All property of the mongodb entity are store in one property of this class and the magic call try to access to it
@@ -14,23 +19,22 @@ class Document
 
     /**
      * the whole data
-     * @var array
      */
-    private $data;
+    private array $data;
 
     /**
      * the whole data
-     * @var string|null
      */
-    private $api;
+    private ?string $api;
 
     /**
      * Initialization the document and specify from which API it was extract
      * @param array $data the whole data
      * @param string|null $api the api name
      */
-    public function __construct(array $data, string $api = null)
+    public function __construct(array $data, ?string $api = null)
     {
+        // performance issues
         $this->recursiveSortArray($data);
         $this->data = $data;
         $this->api  = $api;
@@ -66,20 +70,26 @@ class Document
      * May be a Child of "Document" e.g.: FoodDocument or ProductDocument
      * @param string $apiIdentifier
      * @param array  $data
-     * @return Document
+     * @return Document|BeautyDocument|FoodDocument|PetDocument|ProductDocument
      */
-    public static function createSpecificDocument(string $apiIdentifier, array $data): Document
+    public static function documentFactory(string $apiIdentifier, array $data)
     {
-        if ($apiIdentifier === '') {
-            return new Document($data, $apiIdentifier);
+        $className = Document::class;
+        switch ($apiIdentifier) {
+            case 'beauty':
+                $className = BeautyDocument::class;
+                break;
+            case 'food':
+                $className = FoodDocument::class;
+                break;
+            case 'pet':
+                $className = PetDocument::class;
+                break;
+            case 'product':
+                $className = ProductDocument::class;
+                break;
         }
 
-        $className = "OpenFoodFacts\Document\\" . ucfirst($apiIdentifier) . 'Document';
-
-        if (class_exists($className) && is_subclass_of($className, Document::class)) {
-            return new $className($data, $apiIdentifier);
-        }
-
-        return new Document($data, $apiIdentifier);
+        return new $className($data, $apiIdentifier);
     }
 }

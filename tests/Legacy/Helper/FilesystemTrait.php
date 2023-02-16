@@ -1,6 +1,6 @@
 <?php
 
-namespace OpenFoodFacts;
+namespace OpenFoodFactsTests\Legacy\Helper;
 
 trait FilesystemTrait
 {

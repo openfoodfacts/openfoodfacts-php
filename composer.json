@@ -16,15 +16,20 @@
     {
       "name": "Roberto Moreno",
       "email": "rmorenp@rampmaster.org",
-      "homepage": "http://www.rampmaster.org",
+      "homepage": "https://rampmaster.org/",
       "role": "Wrapper Developer"
+    },
+    {
+      "name": "Colin Benoit",
+      "homepage": "https://github.com/Benoit382",
+      "role": "PHP Developer"
     }
   ],
   "require": {
-    "php": "^7.2|^8.0",
+    "php": "^7.4|^8.0",
     "ext-json": "*",
     "ext-curl": "*",
-    "guzzlehttp/guzzle": "^6.3|^7.0",
+    "guzzlehttp/guzzle": "^7.4",
     "psr/log": "^1.0",
     "psr/simple-cache": "^1.0"
   },
@@ -36,11 +41,12 @@
   },
   "require-dev": {
     "ext-gd": "*",
-    "monolog/monolog": "^1.23",
-    "symfony/cache": "^4.3",
-    "phpunit/phpunit": "^8.5|^9.5",
+    "monolog/monolog": "^2.3",
+    "symfony/cache": "^5.3",
+    "phpunit/phpunit": "^9.5",
     "phpstan/phpstan": "^0.12.99",
     "phpstan/phpstan-phpunit": "^0.12.22",
-    "friendsofphp/php-cs-fixer": "^3.1"
+    "friendsofphp/php-cs-fixer": "^3.2",
+    "symfony/var-dumper": "^5.3"
   }
 }

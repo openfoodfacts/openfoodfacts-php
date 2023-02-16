@@ -1,9 +1,9 @@
 <?php
 
-namespace OpenFoodFactsTests;
+namespace OpenFoodFactsTests\Legacy;
 
 use GuzzleHttp;
-use OpenFoodFacts\FilesystemTrait;
+use OpenFoodFactsTests\Helper\FilesystemTrait;
 use OpenFoodFacts\Api;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Psr16Cache;

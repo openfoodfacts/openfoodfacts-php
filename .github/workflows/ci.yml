@@ -39,8 +39,8 @@ jobs:
       - name: check dependancy
         uses: symfonycorp/security-checker-action@v4
       - name: Check quality code
-        run: bin/php-cs-fixer fix --ansi --dry-run --using-cache=no --verbose
+        run: vendor/bin/php-cs-fixer fix --ansi --dry-run --using-cache=no --verbose
       - name: Execute phpstan
-        run: bin/phpstan
+        run: vendor/bin/phpstan
       - name: Execute tests
-        run: bin/phpunit --verbose
+        run: vendor/bin/phpunit --verbose

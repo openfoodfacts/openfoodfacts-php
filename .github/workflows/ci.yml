@@ -3,6 +3,9 @@ on:
   push:
   pull_request:
 jobs:
+  concurrency:
+    group: ${{ github.ref }}
+    cancel-in-progress: true
   tests:
     runs-on: ubuntu-latest
     strategy:

@@ -392,7 +392,7 @@ class Api
     {
         $url        .= ($isJsonFile ? '.json' : '');
         $realUrl    = $url;
-        $cacheKey   = sha1($realUrl);
+        $cacheKey   = hash('sha256',$realUrl);
 
         if (!empty($this->cache) && $this->cache->has($cacheKey)) {
             /** @var array $cachedResult */
@@ -462,7 +462,7 @@ class Api
             $data['form_params'] = $postData;
         }
 
-        $cacheKey = sha1($url . json_encode($data));
+        $cacheKey = hash('sha256',$url . json_encode($data));
 
         if (!empty($this->cache) && $this->cache->has($cacheKey)) {
             return $this->cache->get($cacheKey);

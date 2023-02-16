@@ -48,7 +48,6 @@ class Api
      * @link https://en.wiki.openfoodfacts.org/API/Read#Country_code_.28cc.29_and_Language_of_the_interface_.28lc.29
      * @var string
      */
-    /** @phpstan-ignore-next-line */
     public string $geography  = 'world';
 
     /**

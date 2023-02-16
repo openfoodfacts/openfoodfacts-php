@@ -29,8 +29,11 @@ class ApiFoodTest extends TestCase
         $this->log = $this->createMock(NullLogger::class);
 
         $this->api = new Api('food', 'fr-en', $this->log);
-        @rmdir('tests/tmp');
-        @mkdir('tests/tmp');
+        $testFolder       = 'tests/tmp';
+        if(file_exists($testFolder)){
+            rmdir($testFolder);
+        }
+        mkdir($testFolder);
     }
 
     public function testApiNotFound(): void
@@ -76,10 +79,10 @@ class ApiFoodTest extends TestCase
 
         $collection = $this->api->getByFacets(['trace' => 'eggs', 'country' => 'france'], 3);
         $this->assertInstanceOf(Collection::class, $collection);
-        $this->assertEquals($collection->pageCount(), Collection::defaultPageSize);
-        $this->assertEquals($collection->getPage(), 3);
-        $this->assertEquals($collection->getSkip(), Collection::defaultPageSize * 2);
-        $this->assertEquals($collection->getPageSize(), Collection::defaultPageSize);
+        $this->assertEquals(Collection::defaultPageSize, $collection->pageCount());
+        $this->assertEquals(3, $collection->getPage());
+        $this->assertEquals(Collection::defaultPageSize * 2, $collection->getSkip());
+        $this->assertEquals(Collection::defaultPageSize, $collection->getPageSize());
         $this->assertGreaterThan(1000, $collection->searchCount());
 
         foreach ($collection as $key => $doc) {
@@ -161,7 +164,7 @@ class ApiFoodTest extends TestCase
     {
         $collection = $this->api->search('volvic', 3, 30);
         $this->assertInstanceOf(Collection::class, $collection);
-        $this->assertEquals($collection->pageCount(), 30);
+        $this->assertEquals(30, $collection->pageCount());
         $this->assertGreaterThan(100, $collection->searchCount());
     }
 

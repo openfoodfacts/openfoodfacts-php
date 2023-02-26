@@ -141,6 +141,7 @@ class ApiFoodTest extends TestCase
         $prd = Helper::getProductWithCache($this->api, '3057640385148');
         $this->assertInstanceOf(FoodDocument::class, $prd);
         $file1 = $this->createRandomImage();
+        $this->assertTrue(file_exists($file1) && filesize($file1) > 0);
 
         $result = $this->api->uploadImage('3057640385148', 'front', $file1);
         $this->assertArrayHasKey('status', $result);

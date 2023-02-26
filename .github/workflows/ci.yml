@@ -15,8 +15,8 @@ jobs:
         cancel-in-progress: true
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
-      - uses: actions/cache@v2
+        uses: actions/checkout@v3
+      - uses: actions/cache@v3
         id: cache-db
         with:
           path: ~/.symfony/cache
@@ -32,15 +32,15 @@ jobs:
         id: composer-cache
         run: echo "::set-output name=dir::$(composer config cache-files-dir)"
       - name: Cache dependencies
-        uses: actions/cache@v1
+        uses: actions/cache@v3
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: ${{ matrix.php }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: ${{ matrix.php }}-composer-
       - name: Install Composer dependencies
         run: composer install --prefer-dist --no-interaction --no-progress --no-suggest
-      - name: check dependancy
-        uses: symfonycorp/security-checker-action@v4
+      - name: check dependency
+        uses: symfonycorp/security-checker-action@v5
       - name: Check quality code
         env:
           PHP_CS_FIXER_IGNORE_ENV: 1

@@ -34,7 +34,7 @@ class ApiFoodTest extends TestCase
         if (file_exists($testFolder)) {
             rmdir($testFolder);
         }
-        mkdir($testFolder);
+        mkdir($testFolder, 0755);
     }
 
     public function testApiNotFound(): void

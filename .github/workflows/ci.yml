@@ -42,6 +42,8 @@ jobs:
       - name: check dependancy
         uses: symfonycorp/security-checker-action@v4
       - name: Check quality code
+        env:
+          PHP_CS_FIXER_IGNORE_ENV: 1
         run: vendor/bin/php-cs-fixer fix --ansi --dry-run --using-cache=no --verbose
       - name: Execute phpstan
         run: vendor/bin/phpstan

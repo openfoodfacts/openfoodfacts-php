@@ -202,7 +202,7 @@ class ApiFoodTest extends TestCase
                 imagesetpixel($imageRes, $column, $row, $color);
             }
         }
-        $path = 'tests/tmp/image_' . time() . '.png';
+        $path = __DIR__.'/tmp/image_' . time() . '.png';
         /** @phpstan-ignore-next-line */
         if (imagepng($imageRes, $path)) {
             return $path;

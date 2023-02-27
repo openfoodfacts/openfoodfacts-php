@@ -11,7 +11,6 @@ use OpenFoodFacts\Document\FoodDocument;
 use OpenFoodFacts\Document;
 use OpenFoodFacts\Exception\ProductNotFoundException;
 use OpenFoodFacts\Exception\BadRequestException;
-use PHPUnit\Util\Exception;
 use Psr\Log\NullLogger;
 
 class ApiFoodTest extends TestCase

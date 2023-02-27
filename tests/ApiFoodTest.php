@@ -188,29 +188,29 @@ class ApiFoodTest extends TestCase
         $this->assertInstanceOf(Collection::class, $collection);
     }
 
-    private function createRandomImage(): string
-    {
-        //more entropy
-        $width  = random_int(400, 500);
-        $height = random_int(200, 300);
+    // private function createRandomImage(): string
+    // {
+    //     //more entropy
+    //     $width  = random_int(400, 500);
+    //     $height = random_int(200, 300);
 
-        $imageRes = imagecreatetruecolor($width, $height);
-        for ($row = 0; $row <= $height; $row++) {
-            for ($column = 0; $column <= $width; $column++) {
-                /** @phpstan-ignore-next-line */
-                $color = imagecolorallocate($imageRes, random_int(0, 255), random_int(0, 255), random_int(0, 255));
-                /** @phpstan-ignore-next-line */
-                imagesetpixel($imageRes, $column, $row, $color);
-            }
-        }
-        $path = __DIR__.'/tmp/image_' . time() . '.png';
-        /** @phpstan-ignore-next-line */
-        if (imagepng($imageRes, $path)) {
-            return $path;
-        }
+    //     $imageRes = imagecreatetruecolor($width, $height);
+    //     for ($row = 0; $row <= $height; $row++) {
+    //         for ($column = 0; $column <= $width; $column++) {
+    //             /** @phpstan-ignore-next-line */
+    //             $color = imagecolorallocate($imageRes, random_int(0, 255), random_int(0, 255), random_int(0, 255));
+    //             /** @phpstan-ignore-next-line */
+    //             imagesetpixel($imageRes, $column, $row, $color);
+    //         }
+    //     }
+    //     $path = __DIR__.'/tmp/image_' . time() . '.png';
+    //     /** @phpstan-ignore-next-line */
+    //     if (imagepng($imageRes, $path)) {
+    //         return $path;
+    //     }
 
-        throw new Exception('Error Processing Request', 1);
-    }
+    //     throw new Exception('Error Processing Request', 1);
+    // }
 
     protected function tearDown(): void
     {

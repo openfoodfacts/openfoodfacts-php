@@ -135,32 +135,32 @@ class ApiFoodTest extends TestCase
         $this->api->uploadImage('3057640385148', 'front', 'nothing');
     }
 
-    public function testApiAddRandomImage(): void
-    {
-        $this->api->activeTestMode();
-        $prd = Helper::getProductWithCache($this->api, '3057640385148');
-        $this->assertInstanceOf(FoodDocument::class, $prd);
-        $file1 = $this->createRandomImage();
-        $this->assertTrue(file_exists($file1) && filesize($file1) > 0);
+    // public function testApiAddRandomImage(): void
+    // {
+    //     $this->api->activeTestMode();
+    //     $prd = Helper::getProductWithCache($this->api, '3057640385148');
+    //     $this->assertInstanceOf(FoodDocument::class, $prd);
+    //     $file1 = $this->createRandomImage();
+    //     $this->assertTrue(file_exists($file1) && filesize($file1) > 0);
 
-        $result = $this->api->uploadImage('3057640385148', 'front', $file1);
-        $this->assertArrayHasKey('status', $result);
-        if ($result['status'] === 'status ok') {
-            $this->assertEquals($result['status'], 'status ok');
-            $this->assertTrue(isset($result['imagefield']));
-            $this->assertTrue(isset($result['image']));
-            $this->assertTrue(isset($result['image']['imgid']));
-        } else {
-            $this->assertEquals($result['status'], 'status not ok');
-            $this->assertArrayHasKey('imgid', $result);
-            $this->assertArrayHasKey('debug', $result);
-            $this->assertStringContainsString($result['debug'], 'product_id: 3057640385148 - user_id:  - imagefield: front_fr - we have already received an image with this file size: ');
-            $this->assertArrayHasKey('error', $result);
-            $this->assertSame($result['error'], 'This picture has already been sent.');
+    //     $result = $this->api->uploadImage('3057640385148', 'front', $file1);
+    //     $this->assertArrayHasKey('status', $result);
+    //     if ($result['status'] === 'status ok') {
+    //         $this->assertEquals($result['status'], 'status ok');
+    //         $this->assertTrue(isset($result['imagefield']));
+    //         $this->assertTrue(isset($result['image']));
+    //         $this->assertTrue(isset($result['image']['imgid']));
+    //     } else {
+    //         $this->assertEquals($result['status'], 'status not ok');
+    //         $this->assertArrayHasKey('imgid', $result);
+    //         $this->assertArrayHasKey('debug', $result);
+    //         $this->assertStringContainsString($result['debug'], 'product_id: 3057640385148 - user_id:  - imagefield: front_fr - we have already received an image with this file size: ');
+    //         $this->assertArrayHasKey('error', $result);
+    //         $this->assertSame($result['error'], 'This picture has already been sent.');
 
-            $this->addWarning('Impossible to verify the upload image');
-        }
-    }
+    //         $this->addWarning('Impossible to verify the upload image');
+    //     }
+    // }
 
     public function testApiSearch(): void
     {

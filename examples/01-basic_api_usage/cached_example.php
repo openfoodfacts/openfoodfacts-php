@@ -4,7 +4,7 @@ use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Psr16Cache;
 
 include '../../vendor/autoload.php';
-$logger     = new \Monolog\Logger('test');
+$logger     = new \Psr\Log\NullLogger;
 $httpClient = new \GuzzleHttp\Client();
 // the PSR-6 cache object that you want to use (you might also use a PSR-16 Interface Object directly)
 $psr6Cache  = new FilesystemAdapter();

@@ -9,18 +9,17 @@ use OpenFoodFacts\Collection;
 use OpenFoodFacts\Document\PetDocument;
 use OpenFoodFacts\Document;
 use OpenFoodFacts\Exception\BadRequestException;
-use Monolog\Logger;
+use Psr\Log\NullLogger;
 
 class ApiPetTest extends TestCase
 {
     use FilesystemTrait;
 
-    /** @var Api */
-    private $api;
+    private Api $api;
 
     protected function setUp(): void
     {
-        $this->api = new Api('pet', 'fr', $this->createMock(Logger::class));
+        $this->api = new Api('pet', 'fr', $this->createMock(NullLogger::class));
 
         foreach (glob('tests/images/*') ?: [] as $file) {
             unlink($file);
@@ -51,7 +50,7 @@ class ApiPetTest extends TestCase
         $collection = $this->api->search('chat', 3, 30);
 
         $this->assertInstanceOf(Collection::class, $collection);
-        $this->assertEquals($collection->pageCount(), 30);
+        $this->assertEquals(30, $collection->pageCount());
         $this->assertGreaterThan(100, $collection->searchCount());
     }
 

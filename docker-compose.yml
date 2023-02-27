@@ -1,0 +1,25 @@
+version: '3.7'
+
+services:
+  php-fpm:
+    container_name: openfoodfacts-php
+    build:
+      context: .
+      dockerfile: ./docker/php/Dockerfile
+      args:
+        GITHUB_TOKEN: $GITHUB_TOKEN
+        GROUP_ID: $GROUP_ID
+        USER_ID: $USER_ID
+    environment:
+      XDEBUG_CONFIG: client_host=host.docker.internal
+    image: somecoding/crawler-php-fpm
+    volumes:
+      - .:/var/www/html:delegated
+      - ./docker/php/php.ini:/usr/local/etc/php/conf.d/php.ini
+      - ./docker/php/docker-php-ext-xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+      - ./docker/php/fpm_additional.conf:/usr/local/etc/php-fpm.d/zzzz-fpm_additional.conf # zzzz- to be loaded last: overwrites all before
+      - ./xdebug_profile:/tmp/profile:delegated
+    networks:
+      - default
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

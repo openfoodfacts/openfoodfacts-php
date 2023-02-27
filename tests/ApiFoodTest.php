@@ -135,33 +135,6 @@ class ApiFoodTest extends TestCase
         $this->api->uploadImage('3057640385148', 'front', 'nothing');
     }
 
-    // public function testApiAddRandomImage(): void
-    // {
-    //     $this->api->activeTestMode();
-    //     $prd = Helper::getProductWithCache($this->api, '3057640385148');
-    //     $this->assertInstanceOf(FoodDocument::class, $prd);
-    //     $file1 = $this->createRandomImage();
-    //     $this->assertTrue(file_exists($file1) && filesize($file1) > 0);
-
-    //     $result = $this->api->uploadImage('3057640385148', 'front', $file1);
-    //     $this->assertArrayHasKey('status', $result);
-    //     if ($result['status'] === 'status ok') {
-    //         $this->assertEquals($result['status'], 'status ok');
-    //         $this->assertTrue(isset($result['imagefield']));
-    //         $this->assertTrue(isset($result['image']));
-    //         $this->assertTrue(isset($result['image']['imgid']));
-    //     } else {
-    //         $this->assertEquals($result['status'], 'status not ok');
-    //         $this->assertArrayHasKey('imgid', $result);
-    //         $this->assertArrayHasKey('debug', $result);
-    //         $this->assertStringContainsString($result['debug'], 'product_id: 3057640385148 - user_id:  - imagefield: front_fr - we have already received an image with this file size: ');
-    //         $this->assertArrayHasKey('error', $result);
-    //         $this->assertSame($result['error'], 'This picture has already been sent.');
-
-    //         $this->addWarning('Impossible to verify the upload image');
-    //     }
-    // }
-
     public function testApiSearch(): void
     {
         $collection = $this->api->search('volvic', 3, 30);
@@ -169,7 +142,6 @@ class ApiFoodTest extends TestCase
         $this->assertEquals(30, $collection->pageCount());
         $this->assertGreaterThan(100, $collection->searchCount());
     }
-
 
     public function testFacets(): void
     {
@@ -187,30 +159,6 @@ class ApiFoodTest extends TestCase
         $collection = $this->api->getEntry_dates();
         $this->assertInstanceOf(Collection::class, $collection);
     }
-
-    // private function createRandomImage(): string
-    // {
-    //     //more entropy
-    //     $width  = random_int(400, 500);
-    //     $height = random_int(200, 300);
-
-    //     $imageRes = imagecreatetruecolor($width, $height);
-    //     for ($row = 0; $row <= $height; $row++) {
-    //         for ($column = 0; $column <= $width; $column++) {
-    //             /** @phpstan-ignore-next-line */
-    //             $color = imagecolorallocate($imageRes, random_int(0, 255), random_int(0, 255), random_int(0, 255));
-    //             /** @phpstan-ignore-next-line */
-    //             imagesetpixel($imageRes, $column, $row, $color);
-    //         }
-    //     }
-    //     $path = __DIR__.'/tmp/image_' . time() . '.png';
-    //     /** @phpstan-ignore-next-line */
-    //     if (imagepng($imageRes, $path)) {
-    //         return $path;
-    //     }
-
-    //     throw new Exception('Error Processing Request', 1);
-    // }
 
     protected function tearDown(): void
     {

@@ -20,8 +20,9 @@ class Document
     /**
      * Initialization the document and specify from which API it was extract
      * @param array $data the whole data
+     * @param string|null $api the api name
      */
-    public function __construct(array $data)
+    public function __construct(array $data, string $api = null)
     {
         $this->recursiveSortArray($data);
         $this->data = $data;

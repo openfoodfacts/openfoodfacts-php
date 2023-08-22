@@ -19,7 +19,7 @@ class ApiPetTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->api = new Api('pet', 'fr', $this->createMock(NullLogger::class));
+        $this->api = new Api('SDK Unit test', 'pet', 'fr', $this->createMock(NullLogger::class));
 
         foreach (glob('tests/images/*') ?: [] as $file) {
             unlink($file);

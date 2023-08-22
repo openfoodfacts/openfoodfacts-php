@@ -28,12 +28,13 @@ class ApiFoodTest extends TestCase
     {
         $this->log = $this->createMock(NullLogger::class);
 
-        $this->api = new Api('food', 'fr-en', $this->log);
+        $this->api = new Api('SDK Unit test', 'food', 'fr-en', $this->log);
         $testFolder       = 'tests/tmp';
         if (file_exists($testFolder)) {
             rmdir($testFolder);
         }
         mkdir($testFolder, 0755);
+
     }
 
     public function testApiNotFound(): void

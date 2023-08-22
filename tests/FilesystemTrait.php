@@ -4,7 +4,7 @@ namespace OpenFoodFacts;
 
 trait FilesystemTrait
 {
-    public function recursiveDeleteDirectory(string $dir): void
+    public static function recursiveDeleteDirectory(string $dir): void
     {
         if (is_dir($dir)) {
             $objects = scandir($dir) ?: [];

@@ -32,12 +32,12 @@ class ApiFoodCacheTest extends ApiFoodTest
             CURLOPT_FRESH_CONNECT => true,
             'defaults' => [
                 'headers' => [
-                    'CURLOPT_USERAGENT' => 'OFF - PHP - SDK - Unit Test',
+                    CURLOPT_USERAGENT => 'OFF - PHP - SDK - Unit Test',
                 ],
             ],
         ]);
 
-        $api = new Api('food', 'fr-en', $this->log, $httpClient, $cache);
+        $api = new Api('SDK Unit test', 'food', 'fr-en', $this->log, $httpClient, $cache);
         $this->assertInstanceOf(Api::class, $api);
         $this->api = $api;
     }

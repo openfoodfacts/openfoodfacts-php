@@ -2,14 +2,13 @@
 
 namespace OpenFoodFactsTests;
 
-use OpenFoodFacts\FilesystemTrait;
-use PHPUnit\Framework\TestCase;
+use Monolog\Logger;
 use OpenFoodFacts\Api;
 use OpenFoodFacts\Collection;
-use OpenFoodFacts\Document\PetDocument;
 use OpenFoodFacts\Document;
+use OpenFoodFacts\Document\PetDocument;
 use OpenFoodFacts\Exception\BadRequestException;
-use Monolog\Logger;
+use PHPUnit\Framework\TestCase;
 
 class ApiPetTest extends TestCase
 {
@@ -20,7 +19,7 @@ class ApiPetTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->api = new Api('pet', 'fr', $this->createMock(Logger::class));
+        $this->api = new Api('SDK Unit test', 'pet', 'fr', $this->createMock(Logger::class));
 
         foreach (glob('tests/images/*') ?: [] as $file) {
             unlink($file);

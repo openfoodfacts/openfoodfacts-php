@@ -23,7 +23,7 @@ trait FilesystemTrait
     public static function cleanTestFolder(): void
     {
         self::recursiveDeleteDirectory('tests/tmp');
-        mkdir('tests/tmp');
-        mkdir('tests/tmp/cache');
+        mkdir('tests/tmp', 0755);
+        mkdir('tests/tmp/cache', 0755);
     }
 }

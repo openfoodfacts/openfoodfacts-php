@@ -2,16 +2,15 @@
 
 namespace OpenFoodFactsTests;
 
-use OpenFoodFacts\FilesystemTrait;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
+use Monolog\Logger;
 use OpenFoodFacts\Api;
 use OpenFoodFacts\Collection;
-use OpenFoodFacts\Document\FoodDocument;
 use OpenFoodFacts\Document;
-use OpenFoodFacts\Exception\ProductNotFoundException;
+use OpenFoodFacts\Document\FoodDocument;
 use OpenFoodFacts\Exception\BadRequestException;
-use Monolog\Logger;
+use OpenFoodFacts\Exception\ProductNotFoundException;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 class ApiFoodTest extends TestCase
 {
@@ -28,9 +27,8 @@ class ApiFoodTest extends TestCase
     {
         $this->log = $this->createMock(Logger::class);
 
-        $this->api = new Api('food', 'fr-en', $this->log);
-        @rmdir('tests/tmp');
-        @mkdir('tests/tmp');
+        $this->api = new Api('SDK Unit test', 'food', 'fr-en', $this->log);
+        self::cleanTestFolder();
     }
 
     public function testApiNotFound(): void
@@ -153,7 +151,7 @@ class ApiFoodTest extends TestCase
             $this->assertArrayHasKey('error', $result);
             $this->assertSame($result['error'], 'This picture has already been sent.');
 
-            $this->addWarning('Impossible to verify the upload image');
+            $this->markTestIncomplete('Impossible to verify the upload image');
         }
     }
 

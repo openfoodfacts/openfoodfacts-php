@@ -103,38 +103,35 @@ class Collection implements \Iterator
     /**
      * @inheritDoc
      */
-    public function rewind()
+    public function rewind(): void
     {
         reset($this->listDocuments);
     }
     /**
      * @inheritDoc
-     * @return Document|false
      */
-    public function current()
+    public function current(): Document|false
     {
         return current($this->listDocuments);
     }
     /**
      * @inheritDoc
-     * @return int|null
      */
-    public function key()
+    public function key(): int|null
     {
         return key($this->listDocuments);
     }
     /**
      * @inheritDoc
-     * @return Document|false
      */
-    public function next()
+    public function next(): void
     {
-        return next($this->listDocuments);
+        next($this->listDocuments);
     }
     /**
      * @inheritDoc
      */
-    public function valid()
+    public function valid(): bool
     {
         $key = key($this->listDocuments);
         return ($key !== null && $key !== false);

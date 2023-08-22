@@ -3,7 +3,6 @@
 namespace OpenFoodFactsTests;
 
 use GuzzleHttp;
-use OpenFoodFacts\FilesystemTrait;
 use OpenFoodFacts\Api;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Psr16Cache;
@@ -15,9 +14,7 @@ class ApiFoodCacheTest extends ApiFoodTest
     protected function setUp(): void
     {
         parent::setUp();
-        @rmdir('tests/tmp');
-        @mkdir('tests/tmp');
-        @mkdir('tests/tmp/cache');
+        self::cleanTestFolder();
         $psr6Cache = new FilesystemAdapter(sprintf('testrun_%u', rand(0, 1000)), 10, 'tests/tmp/cache');
         $cache     = new Psr16Cache($psr6Cache);
 
@@ -28,12 +25,12 @@ class ApiFoodCacheTest extends ApiFoodTest
             CURLOPT_FRESH_CONNECT => true,
             'defaults' => [
                 'headers' => [
-                    'CURLOPT_USERAGENT' => 'OFF - PHP - SDK - Unit Test',
+                    CURLOPT_USERAGENT => 'OFF - PHP - SDK - Unit Test',
                 ],
             ],
         ]);
 
-        $api = new Api('food', 'fr-en', $this->log, $httpClient, $cache);
+        $api = new Api('SDK Unit test', 'food', 'fr-en', $this->log, $httpClient, $cache);
         $this->assertInstanceOf(Api::class, $api);
         $this->api = $api;
     }

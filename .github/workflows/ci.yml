@@ -9,7 +9,7 @@ jobs:
       max-parallel: 1
       fail-fast: false
       matrix:
-        php: ['7.2', '7.3', '7.4', '8.0']
+        php: ['8.1', '8.2']
     name: Tests - PHP ${{ matrix.php }} 
     steps:
       - name: Checkout code
@@ -38,10 +38,10 @@ jobs:
       - name: Install Composer dependencies
         run: composer install --prefer-dist --no-interaction --no-progress --no-suggest
       - name: check dependancy
-        uses: symfonycorp/security-checker-action@v2
+        uses: symfonycorp/security-checker-action@v4
       - name: Check quality code
         run: vendor/bin/php-cs-fixer fix --ansi --dry-run --using-cache=no --verbose
       - name: Execute phpstan
         run: vendor/bin/phpstan
       - name: Execute tests
-        run: vendor/bin/phpunit --verbose
+        run: vendor/bin/phpunit

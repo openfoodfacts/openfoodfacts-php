@@ -36,26 +36,13 @@ class Api
      * this property store the current base of the url
      * @var string
      */
-    private $geoUrl     = 'https://%s.openfoodfacts.org';
+    private $geoUrl;
 
     /**
      * this property store the current API (it could be : food/beauty/pet )
      * @var string
      */
-    private $currentAPI = '';
-
-    /**
-     * This property store the current location for http call
-     *
-     * This property could be world for all product or you can specify le country code (cc) and
-     * language of the interface (lc). If you want filter on french product you can set fr as country code.
-     * We strongly recommend to use english as language of the interface
-     *
-     * @example fr-en
-     * @link https://en.wiki.openfoodfacts.org/API/Read#Country_code_.28cc.29_and_Language_of_the_interface_.28lc.29
-     * @var string
-     */
-    private $geography  = 'world';
+    private $currentAPI;
 
     /**
      * this property store the auth parameter (username and password)
@@ -129,12 +116,13 @@ class Api
      * the constructor of the function
      *
      * @param string $api the environment to search
-     * @param string $geography this parameter represent the the country  code and the interface of the language
+     * @param string $geography this parameter represent the the country code and the interface of the language
      * @param LoggerInterface $logger this parameter define an logger
      * @param ClientInterface|null $clientInterface
      * @param CacheInterface|null $cacheInterface
      */
     public function __construct(
+        public readonly string $userAgent,
         string $api = 'food',
         string $geography = 'world',
         LoggerInterface $logger = null,
@@ -146,7 +134,6 @@ class Api
         $this->httpClient   = $clientInterface ?? new Client();
 
         $this->geoUrl     = sprintf(self::LIST_API[$api], $geography);
-        $this->geography  = $geography;
         $this->currentAPI = $api;
     }
 
@@ -368,7 +355,14 @@ class Api
 
         $url        = $this->buildUrl('data', self::FILE_TYPE_MAP[$fileType]);
         try {
-            $response = $this->httpClient->request('get', $url, ['sink' => $filePath]);
+            $response = $this->httpClient->request(
+                'get',
+                $url,
+                [
+                    'sink' => $filePath,
+                    'headers' => $this->getDefaultHeaders()
+                ]
+            );
         } catch (GuzzleException $guzzleException) {
             $this->logger->warning(sprintf('OpenFoodFact - fetch - failed - GET : %s', $url), ['exception' => $guzzleException]);
             $exception = new BadRequestException($guzzleException->getMessage(), $guzzleException->getCode(), $guzzleException);
@@ -399,20 +393,18 @@ class Api
         $cacheKey   = md5($realUrl);
 
         if (!empty($this->cache) && $this->cache->has($cacheKey)) {
+            /** @var array $cachedResult */
             $cachedResult = $this->cache->get($cacheKey);
+
             return $cachedResult;
         }
+        $data = $this->getDefaultOptions();
 
-        $data = [
-            'on_stats' => function (TransferStats $stats) use (&$realUrl) {
-                // this function help to find redirection
-                // On redirect we lost some parameters like page
-                $realUrl= (string)$stats->getEffectiveUri();
-            }
-        ];
-        if ($this->auth) {
-            $data['auth'] = array_values($this->auth);
-        }
+        $data['on_stats'] = function (TransferStats $stats) use (&$realUrl) {
+            // this function help to find redirection
+            // On redirect we lost some parameters like page
+            $realUrl = (string)$stats->getEffectiveUri();
+        };
 
         try {
             $response = $this->httpClient->request('get', $url, $data);
@@ -428,6 +420,7 @@ class Api
         }
         $this->logger->info('OpenFoodFact - fetch - GET : ' . $url . ' - ' . $response->getStatusCode());
 
+        /** @var array $jsonResult */
         $jsonResult = json_decode($response->getBody(), true);
 
         if (!empty($this->cache) && !empty($jsonResult)) {
@@ -448,10 +441,8 @@ class Api
      */
     private function fetchPost(string $url, array $postData, bool $isMultipart = false): array
     {
-        $data = [];
-        if ($this->auth) {
-            $data['auth'] = array_values($this->auth);
-        }
+        $data = $this->getDefaultOptions();
+
         if ($isMultipart) {
             foreach ($postData as $key => $value) {
                 $data['multipart'][] = [
@@ -466,7 +457,10 @@ class Api
         $cacheKey = md5($url . json_encode($data));
 
         if (!empty($this->cache) && $this->cache->has($cacheKey)) {
-            return $this->cache->get($cacheKey);
+            /** @var array $cachedResult */
+            $cachedResult = $this->cache->get($cacheKey);
+
+            return $cachedResult;
         }
 
         try {
@@ -479,6 +473,7 @@ class Api
 
         $this->logger->info('OpenFoodFact - fetch - GET : ' . $url . ' - ' . $response->getStatusCode());
 
+        /** @var array $jsonResult */
         $jsonResult = json_decode($response->getBody(), true);
 
         if (!empty($this->cache) && !empty($jsonResult)) {
@@ -492,7 +487,7 @@ class Api
      * This private function generates an url according to the parameters
      * @param  string|null $service
      * @param  string|array|null $resourceType
-     * @param  integer|string|array|null $parameters
+     * @param  int|string|array|null $parameters
      * @return string               the generated url
      */
     private function buildUrl(string $service = null, $resourceType = null, $parameters = null): string
@@ -500,26 +495,35 @@ class Api
         $baseUrl = null;
         switch ($service) {
             case 'api':
+                if(!is_string($resourceType ?? '') || !is_string($parameters ?? '')) {
+                    throw new BadRequestException('Impossible to build requested url');
+                }
                 $baseUrl = implode('/', [
                   $this->geoUrl,
                   $service,
                   'v0',
-                  $resourceType,
-                  $parameters
+                  $resourceType ?? '',
+                  $parameters ?? ''
                 ]);
                 break;
             case 'data':
+                if(!is_string($resourceType ?? '')) {
+                    throw new BadRequestException('Impossible to build requested url');
+                }
                 $baseUrl = implode('/', [
                   $this->geoUrl,
                   $service,
-                  $resourceType
+                  $resourceType ?? ''
                 ]);
                 break;
             case 'cgi':
+                if(!is_string($resourceType ?? '')) {
+                    throw new BadRequestException('Impossible to build requested url');
+                }
                 $baseUrl = implode('/', [
                   $this->geoUrl,
                   $service,
-                  $resourceType
+                  $resourceType ?? ''
                 ]);
                 $baseUrl .= '?' . (is_array($parameters) ? http_build_query($parameters) : $parameters);
                 break;
@@ -531,12 +535,12 @@ class Api
                 if ($resourceType == 'ingredients') {
                     //need test
                     $resourceType = implode('/', ["state",  "ingredients-completed"]);
-                    $parameters   = 1;
+                    $parameters   = '1';
                 }
                 $baseUrl = implode('/', array_filter([
                     $this->geoUrl,
                     $resourceType,
-                    $parameters
+                    is_array($parameters) ? '' : $parameters
                 ], function ($value) {
                     return !empty($value);
                 }));
@@ -544,4 +548,30 @@ class Api
         }
         return $baseUrl;
     }
+
+    /**
+     * @return array
+     */
+    private function getDefaultOptions(): array
+    {
+        $data = [
+            'headers' => $this->getDefaultHeaders(),
+        ];
+        if ($this->auth) {
+            $data['auth'] = array_values($this->auth);
+        }
+        return $data;
+    }
+
+    /**
+     * @return array
+     */
+    private function getDefaultHeaders(): array
+    {
+        return [
+            'User-Agent' => 'SDK PHP - ' . $this->userAgent,
+        ];
+    }
+
+
 }

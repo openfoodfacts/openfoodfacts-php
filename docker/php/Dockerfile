@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:experimental
 FROM composer:2 AS COMPOSER
 ENV COMPOSER_HOME=/usr/config/composer
-ARG GITHUB_TOKEN
+ARG GITHUB_TOKEN=""
 RUN if [[ -z "$GITHUB_TOKEN" ]] ; then echo Github Token not provided ; else composer config -g github-oauth.github.com $GITHUB_TOKEN; fi
 
 FROM php:8.1-fpm
@@ -12,7 +12,7 @@ ARG GROUP_ID
 RUN usermod -u $USER_ID www-data && groupmod -g $GROUP_ID www-data
 
 # Install php-src extensions
-RUN apt-get -qq update && apt-get -qq install \
+RUN apt-get -qq update && apt-get -qq --no-install-recommends install \
          libzip-dev \
          unzip \
          libpng-dev \
@@ -30,13 +30,13 @@ RUN apt-get -qq update && apt-get -qq install \
          pdo_mysql > /dev/null &&  \
      rm -rf /tmp/pear  > /dev/null && \
      rm -rf /var/lib/apt/lists/*
-RUN mkdir /tmp/profile; chmod 777 /tmp/profile
+RUN mkdir /tmp/profile; chmod 755 /tmp/profile
 
 # Install composer and dependencies
-COPY --chown=www-data:www-data --from=COMPOSER /usr/bin/composer /usr/bin/composer
+COPY --chown=www-data:www-data --from=COMPOSER --chmod=755 /usr/bin/composer /usr/bin/composer
 
 
-ARG GITHUB_TOKEN
+ARG GITHUB_TOKEN=""
 ###COPY --chown=www-data:www-data --from=COMPOSER /usr/config/composer /usr/config/composer
 #Re-enable aboce COPY when Token is set
 

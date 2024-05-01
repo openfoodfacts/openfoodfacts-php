@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:experimental
 FROM composer:2 AS COMPOSER
 ENV COMPOSER_HOME=/usr/config/composer
-ARG GITHUB_TOKEN=""
+ENV GITHUB_TOKEN=""
 RUN if [[ -z "$GITHUB_TOKEN" ]] ; then echo Github Token not provided ; else composer config -g github-oauth.github.com $GITHUB_TOKEN; fi
 
 FROM php:8.1-fpm
@@ -33,10 +33,10 @@ RUN apt-get -qq update && apt-get -qq --no-install-recommends install \
 RUN mkdir /tmp/profile; chmod 755 /tmp/profile
 
 # Install composer and dependencies
-COPY --chown=www-data:www-data --from=COMPOSER --chmod=755 /usr/bin/composer /usr/bin/composer
+COPY --chown=root:root --from=COMPOSER --chmod=755 /usr/bin/composer /usr/bin/composer
 
 
-ARG GITHUB_TOKEN=""
+ENV GITHUB_TOKEN=""
 ###COPY --chown=www-data:www-data --from=COMPOSER /usr/config/composer /usr/config/composer
 #Re-enable aboce COPY when Token is set
 

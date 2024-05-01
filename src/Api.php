@@ -28,21 +28,14 @@ class Api
 {
     /**
      * the httpClient for all http request
-     * @var ClientInterface
      */
-    private $httpClient;
+    private ClientInterface $httpClient;
 
     /**
      * this property store the current base of the url
-     * @var string
      */
-    private $geoUrl     = 'https://%s.openfoodfacts.org';
+    private string $geoUrl     = 'https://%s.openfoodfacts.org';
 
-    /**
-     * this property store the current API (it could be : food/beauty/pet )
-     * @var string
-     */
-    private $currentAPI = '';
 
     /**
      * This property store the current location for http call
@@ -55,29 +48,22 @@ class Api
      * @link https://en.wiki.openfoodfacts.org/API/Read#Country_code_.28cc.29_and_Language_of_the_interface_.28lc.29
      * @var string
      */
-    private $geography  = 'world';
+    public string $geography  = 'world';
 
     /**
      * this property store the auth parameter (username and password)
-     * @var array
      */
-    private $auth       = null;
+    private ?array $auth       = null;
 
     /**
      * this property help you to log information
-     * @var LoggerInterface
      */
-    private $logger     = null;
+    private LoggerInterface $logger;
 
-
-    /**
-     * @var CacheInterface|null
-     */
-    private $cache;
+    private ?CacheInterface $cache;
 
     /**
      * this constant defines the environments usable by the API
-     * @var array
      */
     private const LIST_API = [
         'food'    => 'https://%s.openfoodfacts.org',
@@ -90,7 +76,6 @@ class Api
      * This constant defines the facets usable by the API
      *
      * This variable is used to create the magic functions like "getIngredients" or "getBrands"
-     * @var array
      */
     private const FACETS = [
         'additives',
@@ -120,34 +105,32 @@ class Api
      * @var array
      */
     private const FILE_TYPE_MAP = [
-        "mongodb"   => "openfoodfacts-mongodbdump.tar.gz",
-        "csv"       => "en.openfoodfacts.org.products.csv",
-        "rdf"       => "en.openfoodfacts.org.products.rdf"
+        'mongodb'   => 'openfoodfacts-mongodbdump.tar.gz',
+        'csv'       => 'en.openfoodfacts.org.products.csv',
+        'rdf'       => 'en.openfoodfacts.org.products.rdf'
     ];
 
     /**
      * the constructor of the function
      *
-     * @param string $api the environment to search
+     * @param string $currentAPI the environment to search
      * @param string $geography this parameter represent the the country  code and the interface of the language
      * @param LoggerInterface $logger this parameter define an logger
      * @param ClientInterface|null $clientInterface
      * @param CacheInterface|null $cacheInterface
      */
     public function __construct(
-        string $api = 'food',
+        private readonly string $currentAPI = 'food',
         string $geography = 'world',
-        LoggerInterface $logger = null,
-        ClientInterface $clientInterface = null,
-        CacheInterface $cacheInterface = null
+        ?LoggerInterface $logger = null,
+        ?ClientInterface $clientInterface = null,
+        ?CacheInterface $cacheInterface = null
     ) {
         $this->cache        = $cacheInterface;
         $this->logger       = $logger ?? new NullLogger();
         $this->httpClient   = $clientInterface ?? new Client();
 
-        $this->geoUrl     = sprintf(self::LIST_API[$api], $geography);
-        $this->geography  = $geography;
-        $this->currentAPI = $api;
+        $this->geoUrl     = sprintf(self::LIST_API[$currentAPI], $geography);
     }
 
     /**
@@ -198,12 +181,12 @@ class Api
                 throw new BadRequestException('Facet "' . $facet . '" not found');
             }
 
-            if ($facet === "purchase_places") {
-                $facet = "purchase-places";
-            } elseif ($facet === "packaging_codes") {
-                $facet = "packager-codes";
-            } elseif ($facet === "entry_dates") {
-                $facet = "entry-dates";
+            if ($facet === 'purchase_places') {
+                $facet = 'purchase-places';
+            } elseif ($facet === 'packaging_codes') {
+                $facet = 'packager-codes';
+            } elseif ($facet === 'entry_dates') {
+                $facet = 'entry-dates';
             }
 
             $url = $this->buildUrl(null, $facet, []);
@@ -217,6 +200,7 @@ class Api
                     'page_size' => $result['count'],
                 ];
             }
+
             return new Collection($result, $this->currentAPI);
         }
 
@@ -239,7 +223,7 @@ class Api
         $rawResult = $this->fetch($url);
         if ($rawResult['status'] === 0) {
             //TODO: maybe return null here? (just throw an exception if something really went wrong?
-            throw new ProductNotFoundException("Product not found", 1);
+            throw new ProductNotFoundException('Product not found', 1);
         }
 
         return Document::createSpecificDocument($this->currentAPI, $rawResult['product']);
@@ -267,6 +251,7 @@ class Api
 
         $url = $this->buildUrl(null, $search, $page);
         $result = $this->fetch($url);
+
         return new Collection($result, $this->currentAPI);
     }
 
@@ -289,6 +274,7 @@ class Api
         if ($result['status_verbose'] === 'fields saved' && $result['status'] === 1) {
             return true;
         }
+
         return $result['status_verbose'];
     }
 
@@ -307,7 +293,7 @@ class Api
         if ($this->currentAPI !== 'food') {
             throw new BadRequestException('not Available yet');
         }
-        if (!in_array($imageField, ["front", "ingredients", "nutrition"])) {
+        if (!in_array($imageField, ['front', 'ingredients', 'nutrition'])) {
             throw new BadRequestException('ImageField not valid!');
         }
         if (!file_exists($imagePath)) {
@@ -321,7 +307,14 @@ class Api
             'imagefield'                => $imageField,
             'imgupload_' . $imageField  => fopen($imagePath, 'r')
         ];
-        return $this->fetchPost($url, $postData, true);
+
+        try {
+            return $this->fetchPost($url, $postData, true);
+        } finally {
+            if (is_resource($postData['imgupload_' . $imageField])) {
+                fclose($postData['imgupload_' . $imageField]);
+            }
+        }
     }
 
     /**
@@ -346,6 +339,7 @@ class Api
 
         $url = $this->buildUrl('cgi', 'search.pl', $parameters);
         $result = $this->fetch($url, false);
+
         return new Collection($result, $this->currentAPI);
     }
 
@@ -356,17 +350,19 @@ class Api
      * @return bool             return true when download is complete
      * @throws BadRequestException
      */
-    public function downloadData(string $filePath, string $fileType = "mongodb")
+    public function downloadData(string $filePath, string $fileType = 'mongodb')
     {
         if (!isset(self::FILE_TYPE_MAP[$fileType])) {
             $this->logger->warning(
                 'OpenFoodFact - fetch - failed - File type not recognized!',
                 ['fileType' => $fileType, 'availableTypes' => self::FILE_TYPE_MAP]
             );
+
             throw new BadRequestException('File type not recognized!');
         }
 
         $url        = $this->buildUrl('data', self::FILE_TYPE_MAP[$fileType]);
+
         try {
             $response = $this->httpClient->request('get', $url, ['sink' => $filePath]);
         } catch (GuzzleException $guzzleException) {
@@ -396,10 +392,12 @@ class Api
     {
         $url        .= ($isJsonFile ? '.json' : '');
         $realUrl    = $url;
-        $cacheKey   = md5($realUrl);
+        $cacheKey   = hash('sha256', $realUrl);
 
         if (!empty($this->cache) && $this->cache->has($cacheKey)) {
+            /** @var array $cachedResult */
             $cachedResult = $this->cache->get($cacheKey);
+
             return $cachedResult;
         }
 
@@ -407,7 +405,7 @@ class Api
             'on_stats' => function (TransferStats $stats) use (&$realUrl) {
                 // this function help to find redirection
                 // On redirect we lost some parameters like page
-                $realUrl= (string)$stats->getEffectiveUri();
+                $realUrl = (string)$stats->getEffectiveUri();
             }
         ];
         if ($this->auth) {
@@ -428,6 +426,7 @@ class Api
         }
         $this->logger->info('OpenFoodFact - fetch - GET : ' . $url . ' - ' . $response->getStatusCode());
 
+        /** @var array $jsonResult */
         $jsonResult = json_decode($response->getBody(), true);
 
         if (!empty($this->cache) && !empty($jsonResult)) {
@@ -463,7 +462,7 @@ class Api
             $data['form_params'] = $postData;
         }
 
-        $cacheKey = md5($url . json_encode($data));
+        $cacheKey = hash('sha256', $url . json_encode($data));
 
         if (!empty($this->cache) && $this->cache->has($cacheKey)) {
             return $this->cache->get($cacheKey);
@@ -500,28 +499,34 @@ class Api
         $baseUrl = null;
         switch ($service) {
             case 'api':
+                /** @phpstan-ignore-next-line */
                 $baseUrl = implode('/', [
-                  $this->geoUrl,
-                  $service,
-                  'v0',
-                  $resourceType,
-                  $parameters
+                    $this->geoUrl,
+                    $service ?? '',
+                    'v0',
+                    $resourceType,
+                    $parameters
                 ]);
+
                 break;
             case 'data':
+                /** @phpstan-ignore-next-line */
                 $baseUrl = implode('/', [
-                  $this->geoUrl,
-                  $service,
-                  $resourceType
+                    $this->geoUrl,
+                    $service,
+                    $resourceType
                 ]);
+
                 break;
             case 'cgi':
+                /** @phpstan-ignore-next-line */
                 $baseUrl = implode('/', [
-                  $this->geoUrl,
-                  $service,
-                  $resourceType
+                    $this->geoUrl,
+                    $service,
+                    $resourceType
                 ]);
                 $baseUrl .= '?' . (is_array($parameters) ? http_build_query($parameters) : $parameters);
+
                 break;
             case null:
             default:
@@ -530,9 +535,10 @@ class Api
                 }
                 if ($resourceType == 'ingredients') {
                     //need test
-                    $resourceType = implode('/', ["state",  "ingredients-completed"]);
+                    $resourceType = implode('/', ['state',  'ingredients-completed']);
                     $parameters   = 1;
                 }
+                /** @phpstan-ignore-next-line */
                 $baseUrl = implode('/', array_filter([
                     $this->geoUrl,
                     $resourceType,
@@ -540,8 +546,10 @@ class Api
                 ], function ($value) {
                     return !empty($value);
                 }));
+
                 break;
         }
+
         return $baseUrl;
     }
 }

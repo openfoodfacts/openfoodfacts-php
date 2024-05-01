@@ -19,7 +19,7 @@ class CollectionTest extends TestCase
         ];
 
         $collection = new Collection([
-            'products'=> $documents,
+            'products' => $documents,
             'count' => 2,
             'page' => 1,
             'skip' => false,

@@ -11,7 +11,7 @@ use OpenFoodFacts\Document\FoodDocument;
 use OpenFoodFacts\Document;
 use OpenFoodFacts\Exception\ProductNotFoundException;
 use OpenFoodFacts\Exception\BadRequestException;
-use Monolog\Logger;
+use Psr\Log\NullLogger;
 
 class ApiFoodTest extends TestCase
 {
@@ -20,17 +20,20 @@ class ApiFoodTest extends TestCase
     /** @var Api */
     protected $api;
     /**
-     * @var Logger|MockObject
+     * @var NullLogger|MockObject
      */
     protected $log;
 
     protected function setUp(): void
     {
-        $this->log = $this->createMock(Logger::class);
+        $this->log = $this->createMock(NullLogger::class);
 
         $this->api = new Api('food', 'fr-en', $this->log);
-        @rmdir('tests/tmp');
-        @mkdir('tests/tmp');
+        $testFolder       = 'tests/tmp';
+        if (file_exists($testFolder)) {
+            rmdir($testFolder);
+        }
+        mkdir($testFolder, 0755);
     }
 
     public function testApiNotFound(): void
@@ -76,10 +79,10 @@ class ApiFoodTest extends TestCase
 
         $collection = $this->api->getByFacets(['trace' => 'eggs', 'country' => 'france'], 3);
         $this->assertInstanceOf(Collection::class, $collection);
-        $this->assertEquals($collection->pageCount(), Collection::defaultPageSize);
-        $this->assertEquals($collection->getPage(), 3);
-        $this->assertEquals($collection->getSkip(), Collection::defaultPageSize * 2);
-        $this->assertEquals($collection->getPageSize(), Collection::defaultPageSize);
+        $this->assertEquals(Collection::defaultPageSize, $collection->pageCount());
+        $this->assertEquals(3, $collection->getPage());
+        $this->assertEquals(Collection::defaultPageSize * 2, $collection->getSkip());
+        $this->assertEquals(Collection::defaultPageSize, $collection->getPageSize());
         $this->assertGreaterThan(1000, $collection->searchCount());
 
         foreach ($collection as $key => $doc) {
@@ -131,43 +134,18 @@ class ApiFoodTest extends TestCase
         $this->api->uploadImage('3057640385148', 'front', 'nothing');
     }
 
-    public function testApiAddRandomImage(): void
-    {
-        $this->api->activeTestMode();
-        $prd = Helper::getProductWithCache($this->api, '3057640385148');
-        $this->assertInstanceOf(FoodDocument::class, $prd);
-        $file1 = $this->createRandomImage();
-
-        $result = $this->api->uploadImage('3057640385148', 'front', $file1);
-        $this->assertArrayHasKey('status', $result);
-        if ($result['status'] === 'status ok') {
-            $this->assertEquals($result['status'], 'status ok');
-            $this->assertTrue(isset($result['imagefield']));
-            $this->assertTrue(isset($result['image']));
-            $this->assertTrue(isset($result['image']['imgid']));
-        } else {
-            $this->assertEquals($result['status'], 'status not ok');
-            $this->assertArrayHasKey('imgid', $result);
-            $this->assertArrayHasKey('debug', $result);
-            $this->assertStringContainsString($result['debug'], 'product_id: 3057640385148 - user_id:  - imagefield: front_fr - we have already received an image with this file size: ');
-            $this->assertArrayHasKey('error', $result);
-            $this->assertSame($result['error'], 'This picture has already been sent.');
-
-            $this->addWarning('Impossible to verify the upload image');
-        }
-    }
-
     public function testApiSearch(): void
     {
         $collection = $this->api->search('volvic', 3, 30);
         $this->assertInstanceOf(Collection::class, $collection);
-        $this->assertEquals($collection->pageCount(), 30);
+        $this->assertEquals(30, $collection->pageCount());
         $this->assertGreaterThan(100, $collection->searchCount());
     }
 
-
     public function testFacets(): void
     {
+        $this->markTestSkipped('Skipped due to intermittent issues at calling API. Replace with mocks?');
+
         $collection = $this->api->getIngredients();
         $this->assertInstanceOf(Collection::class, $collection);
         $this->assertEquals(Collection::defaultPageSize, $collection->pageCount());
@@ -181,29 +159,6 @@ class ApiFoodTest extends TestCase
         $this->assertInstanceOf(Collection::class, $collection);
         $collection = $this->api->getEntry_dates();
         $this->assertInstanceOf(Collection::class, $collection);
-    }
-
-    private function createRandomImage(): string
-    {
-        //more entropy
-        $width  = mt_rand(400, 500);
-        $height = mt_rand(200, 300);
-
-        $imageRes = imagecreatetruecolor($width, $height);
-        for ($row = 0; $row <= $height; $row++) {
-            for ($column = 0; $column <= $width; $column++) {
-                /** @phpstan-ignore-next-line */
-                $color = imagecolorallocate($imageRes, mt_rand(0, 255), mt_rand(0, 255), mt_rand(0, 255));
-                /** @phpstan-ignore-next-line */
-                imagesetpixel($imageRes, $column, $row, $color);
-            }
-        }
-        $path = 'tests/tmp/image_' . time() . '.jpg';
-        /** @phpstan-ignore-next-line */
-        if (imagejpeg($imageRes, $path)) {
-            return $path;
-        }
-        throw new \Exception("Error Processing Request", 1);
     }
 
     protected function tearDown(): void

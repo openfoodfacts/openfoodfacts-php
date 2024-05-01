@@ -10,22 +10,18 @@ class Collection implements \Iterator
     public const defaultPageSize = 24;
 
     /** @var array<int, Document> */
-    private $listDocuments  = [];
-    /** @var int */
-    private $count          = 0;
-    /** @var int */
-    private $page           = 0;
-    /** @var int */
-    private $skip           = 0;
-    /** @var int */
-    private $pageSize       = 0;
+    private array $listDocuments  = [];
+    private int $count          = 0;
+    private int$page           = 0;
+    private int$skip           = 0;
+    private int $pageSize       = 0;
 
     /**
      * initialization of the collection
      * @param array|null $data the raw data
      * @param string|null $api  this information help to type the collection  (not use yet)
      */
-    public function __construct(array $data = null, string $api = null)
+    public function __construct(?array $data = null, ?string $api = null)
     {
         $data = $data ?? [
             'products'  => [],
@@ -52,10 +48,10 @@ class Collection implements \Iterator
             }
         }
 
-        $this->count    = $data['count'];
-        $this->page     = $data['page'];
-        $this->skip     = $data['skip'];
-        $this->pageSize = $data['page_size'];
+        $this->count    = $data['count'] ?? 0;
+        $this->page     = $data['page'] ?? 0;
+        $this->skip     = $data['skip'] ?? 0;
+        $this->pageSize = $data['page_size'] ?? 0;
     }
 
     /**
@@ -103,40 +99,38 @@ class Collection implements \Iterator
     /**
      * @inheritDoc
      */
-    public function rewind()
+    public function rewind(): void
     {
         reset($this->listDocuments);
     }
     /**
      * @inheritDoc
-     * @return Document|false
      */
-    public function current()
+    public function current(): Document|false
     {
         return current($this->listDocuments);
     }
     /**
      * @inheritDoc
-     * @return int|null
      */
-    public function key()
+    public function key(): int|null
     {
         return key($this->listDocuments);
     }
     /**
      * @inheritDoc
-     * @return Document|false
      */
-    public function next()
+    public function next(): void
     {
-        return next($this->listDocuments);
+        next($this->listDocuments);
     }
     /**
      * @inheritDoc
      */
-    public function valid()
+    public function valid(): bool
     {
         $key = key($this->listDocuments);
+
         return ($key !== null && $key !== false);
     }
 }

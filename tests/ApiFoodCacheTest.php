@@ -15,14 +15,18 @@ class ApiFoodCacheTest extends ApiFoodTest
     protected function setUp(): void
     {
         parent::setUp();
-        @rmdir('tests/tmp');
-        @mkdir('tests/tmp');
-        @mkdir('tests/tmp/cache');
-        $psr6Cache = new FilesystemAdapter(sprintf('testrun_%u', rand(0, 1000)), 10, 'tests/tmp/cache');
+        $testFolder       = 'tests/tmp';
+        if (file_exists($testFolder)) {
+            rmdir($testFolder);
+        }
+        mkdir($testFolder, 0755);
+        mkdir($testFolder.'/cache', 0755);
+
+        $psr6Cache = new FilesystemAdapter(sprintf('testrun_%u', random_int(0, 1000)), 10, 'tests/tmp/cache');
         $cache     = new Psr16Cache($psr6Cache);
 
         $httpClient = new GuzzleHttp\Client([
-//            "http_errors" => false, // MUST not use as it crashes error handling
+            // "http_errors" => false, // MUST not use as it crashes error handling
             'Connection' => 'close',
             CURLOPT_FORBID_REUSE => true,
             CURLOPT_FRESH_CONNECT => true,

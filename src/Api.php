@@ -405,7 +405,7 @@ class Api
             'on_stats' => function (TransferStats $stats) use (&$realUrl) {
                 // this function help to find redirection
                 // On redirect we lost some parameters like page
-                $realUrl= (string)$stats->getEffectiveUri();
+                $realUrl = (string)$stats->getEffectiveUri();
             }
         ];
         if ($this->auth) {

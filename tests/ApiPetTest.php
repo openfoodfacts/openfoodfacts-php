@@ -2,13 +2,13 @@
 
 namespace OpenFoodFactsTests;
 
-use OpenFoodFacts\FilesystemTrait;
-use PHPUnit\Framework\TestCase;
 use OpenFoodFacts\Api;
 use OpenFoodFacts\Collection;
-use OpenFoodFacts\Document\PetDocument;
 use OpenFoodFacts\Document;
+use OpenFoodFacts\Document\PetDocument;
 use OpenFoodFacts\Exception\BadRequestException;
+use OpenFoodFacts\FilesystemTrait;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 
 class ApiPetTest extends TestCase
@@ -19,7 +19,7 @@ class ApiPetTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->api = new Api('SDK Unit test', 'pet', 'fr', $this->createMock(NullLogger::class));
+        $this->api = new Api('Integration test', 'pet', 'fr', $this->createMock(NullLogger::class));
 
         foreach (glob('tests/images/*') ?: [] as $file) {
             unlink($file);

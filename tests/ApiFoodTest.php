@@ -2,15 +2,15 @@
 
 namespace OpenFoodFactsTests;
 
+use OpenFoodFacts\Api;
+use OpenFoodFacts\Collection;
+use OpenFoodFacts\Document;
+use OpenFoodFacts\Document\FoodDocument;
+use OpenFoodFacts\Exception\BadRequestException;
+use OpenFoodFacts\Exception\ProductNotFoundException;
 use OpenFoodFacts\FilesystemTrait;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use OpenFoodFacts\Api;
-use OpenFoodFacts\Collection;
-use OpenFoodFacts\Document\FoodDocument;
-use OpenFoodFacts\Document;
-use OpenFoodFacts\Exception\ProductNotFoundException;
-use OpenFoodFacts\Exception\BadRequestException;
 use Psr\Log\NullLogger;
 
 class ApiFoodTest extends TestCase
@@ -28,7 +28,7 @@ class ApiFoodTest extends TestCase
     {
         $this->log = $this->createMock(NullLogger::class);
 
-        $this->api = new Api('SDK Unit test', 'food', 'fr-en', $this->log);
+        $this->api = new Api('Integration test', 'food', 'fr-en', $this->log);
         $testFolder       = 'tests/tmp';
         if (file_exists($testFolder)) {
             rmdir($testFolder);

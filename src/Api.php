@@ -566,6 +566,7 @@ class Api
         if ($this->auth) {
             $data['auth'] = array_values($this->auth);
         }
+
         return $data;
     }
 
@@ -574,6 +575,7 @@ class Api
      */
     private function getDefaultHeaders(): array
     {
+        //Force the use of user agent on each http client no matter they come
         return [
             'User-Agent' => 'SDK PHP - ' . $this->userAgent,
         ];

@@ -540,7 +540,6 @@ class Api
                     $resourceType = implode('/', ['state',  'ingredients-completed']);
                     $parameters   = 1;
                 }
-                /** @phpstan-ignore-next-line */
                 $baseUrl = implode('/', array_filter([
                     $this->geoUrl,
                     $resourceType,

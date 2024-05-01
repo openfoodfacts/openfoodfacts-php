@@ -8,3 +8,7 @@ parameters:
   paths:
     - src
     - tests
+  ignoreErrors:
+    -
+      message: "#^Unreachable statement - code above always terminates.$#"
+      path: tests/ApiFoodTest.php

@@ -15,7 +15,15 @@ RUN docker-php-ext-enable xdebug
 RUN docker-php-ext-install -j$(nproc) gd bcmath
 RUN rm -rf /tmp/pear /var/lib/apt/lists/*
 RUN mkdir /tmp/profile; chmod 755 /tmp/profile
+
+USER nobody
 COPY ./docker/xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
 COPY --from=COMPOSER /opt/app /opt/app
-COPY . .
+# Not permited by Sonar cube even though there is .dockerignore to remove sensitive data
+#COPY . .
+COPY src .
+COPY tests .
+COPY .php-cs-fixer.dist.php .
+COPY phpunit.xml .
+COPY phpstan.neon.dist .

@@ -11,4 +11,4 @@ parameters:
   ignoreErrors:
     -
       message: "#^Unreachable statement - code above always terminates.$#"
-      path: tests/ApiFoodTest.php
+      path: tests/Integration/ApiFoodTest.php

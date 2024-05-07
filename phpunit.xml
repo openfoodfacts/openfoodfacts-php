@@ -11,8 +11,11 @@
     <server name="KERNEL_CLASS" value="AppKernel"/>
   </php>
   <testsuites>
-    <testsuite name="AllTests">
-      <directory>tests</directory>
+    <testsuite name="Unit test">
+      <directory>tests/Unit</directory>
+    </testsuite>
+    <testsuite name="Integration test">
+      <directory>tests/Integration</directory>
     </testsuite>
   </testsuites>
   <logging>

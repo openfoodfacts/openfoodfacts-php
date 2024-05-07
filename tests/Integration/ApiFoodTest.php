@@ -1,6 +1,6 @@
 <?php
 
-namespace OpenFoodFactsTests;
+namespace OpenFoodFactsTests\Integration;
 
 use OpenFoodFacts\Api;
 use OpenFoodFacts\Collection;
@@ -9,6 +9,7 @@ use OpenFoodFacts\Document\FoodDocument;
 use OpenFoodFacts\Exception\BadRequestException;
 use OpenFoodFacts\Exception\ProductNotFoundException;
 use OpenFoodFacts\FilesystemTrait;
+use OpenFoodFactsTests\Helper;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;

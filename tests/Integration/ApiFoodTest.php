@@ -18,6 +18,7 @@ class ApiFoodTest extends TestCase
 {
     use FilesystemTrait;
 
+    private const DEFAULT_BARCODE = '3057640385148';
     /** @var Api */
     protected $api;
     /**
@@ -40,7 +41,7 @@ class ApiFoodTest extends TestCase
 
     public function testApiNotFound(): void
     {
-        $prd = Helper::getProductWithCache($this->api, '3057640385148');
+        $prd = Helper::getProductWithCache($this->api, self::DEFAULT_BARCODE);
 
         $this->assertInstanceOf(FoodDocument::class, $prd);
         $this->assertInstanceOf(Document::class, $prd);
@@ -53,7 +54,7 @@ class ApiFoodTest extends TestCase
 
     public function testApiBadRequest(): void
     {
-        $prd = Helper::getProductWithCache($this->api, '3057640385148');
+        $prd = Helper::getProductWithCache($this->api, self::DEFAULT_BARCODE);
 
         $this->assertInstanceOf(FoodDocument::class, $prd);
         $this->assertInstanceOf(Document::class, $prd);
@@ -68,7 +69,7 @@ class ApiFoodTest extends TestCase
     {
         $collection = $this->api->getByFacets([]);
         $this->assertInstanceOf(Collection::class, $collection);
-        $this->assertEquals($collection->pageCount(), 0);
+        $this->assertEquals(0, $collection->pageCount());
 
         // Check redirect
         $this->log
@@ -98,7 +99,7 @@ class ApiFoodTest extends TestCase
     public function testApiAddProduct(): void
     {
         $this->api->activeTestMode();
-        $prd = Helper::getProductWithCache($this->api, '3057640385148');
+        $prd = Helper::getProductWithCache($this->api, self::DEFAULT_BARCODE);
         $this->assertInstanceOf(FoodDocument::class, $prd);
         $this->assertInstanceOf(Document::class, $prd);
 
@@ -110,14 +111,14 @@ class ApiFoodTest extends TestCase
     public function testApiAddProductException(): void
     {
         $this->api->activeTestMode();
-        $prd = Helper::getProductWithCache($this->api, '3057640385148');
+        $prd = Helper::getProductWithCache($this->api, self::DEFAULT_BARCODE);
 
         $this->expectException(BadRequestException::class);
         $this->api->addNewProduct(['product_name' => $prd->product_name]);
 
         $result   = $this->api->addNewProduct(['code' => '', 'product_name' => $prd->product_name]);
         $this->assertTrue(is_string($result));
-        $this->assertEquals($result, 'no code or invalid code');
+        $this->assertEquals('no code or invalid code', $result);
     }
 
     public function testApiAddImageFieldNotValidException(): void
@@ -125,7 +126,7 @@ class ApiFoodTest extends TestCase
         $this->api->activeTestMode();
         $this->expectException(BadRequestException::class);
         $this->expectExceptionMessage('ImageField not valid!');
-        $this->api->uploadImage('3057640385148', 'fronts', 'nothing');
+        $this->api->uploadImage(self::DEFAULT_BARCODE, 'fronts', 'nothing');
     }
 
     public function testApiAddImageImageNotFoundException(): void
@@ -133,7 +134,7 @@ class ApiFoodTest extends TestCase
         $this->api->activeTestMode();
         $this->expectException(BadRequestException::class);
         $this->expectExceptionMessage('Image not found');
-        $this->api->uploadImage('3057640385148', 'front', 'nothing');
+        $this->api->uploadImage(self::DEFAULT_BARCODE, 'front', 'nothing');
     }
 
     public function testApiSearch(): void

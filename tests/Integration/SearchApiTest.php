@@ -3,8 +3,8 @@
 namespace OpenFoodFactsTests\Integration;
 
 use OpenFoodFacts\Document\SearchDocument;
+use OpenFoodFacts\Model\SearchResult;
 use OpenFoodFacts\SearchApi;
-use OpenFoodFacts\SearchResult;
 use PHPUnit\Framework\TestCase;
 
 class SearchApiTest extends TestCase

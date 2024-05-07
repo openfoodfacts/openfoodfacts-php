@@ -1,6 +1,6 @@
 <?php
 
-namespace OpenFoodFacts;
+namespace OpenFoodFacts\Model;
 
 use OpenFoodFacts\Document\SearchDocument;
 
@@ -10,16 +10,16 @@ class SearchResult
     public array $listDocuments;
 
     public readonly int $count;
-    /** @var bool if false, the value is just an approximation @todo to check */
+    /** @var bool if false, the value is just an approximation*/
     public readonly bool $isCountExact;
     public readonly int $page;
     public readonly int $pageSize;
     public readonly int $pageCount;
     public readonly array $debug;
     public readonly ?array $warning;
-    /** @var int in ms @todo to check */
+    /** @var int time it took in ms  */
     public readonly int $took;
-    /** @var bool @todo need description (partial content if true?) */
+    /** @var bool partial content if true ? */
     public readonly bool $timedOut;
     public readonly array $aggregations;
 

@@ -6,10 +6,11 @@ use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use OpenFoodFacts\Document\SearchDocument;
 use OpenFoodFacts\Exception\BadRequestException;
+use OpenFoodFacts\Exception\InvalidParameterException;
 use OpenFoodFacts\Exception\ProductNotFoundException;
 use OpenFoodFacts\Exception\UnknownException;
-use OpenFoodFacts\Exception\InvalidParameterException;
 use OpenFoodFacts\Exception\ValidationException;
+use OpenFoodFacts\Model\SearchResult;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Psr\SimpleCache\CacheInterface;
@@ -52,10 +53,7 @@ class SearchApi
 
         $cacheKey   = hash('sha256', $url);
         if (!empty($this->cache) && $this->cache->has($cacheKey)) {
-            /** @var SearchDocument $cachedResult */
-            $cachedResult = $this->cache->get($cacheKey);
-
-            return $cachedResult;
+            return $this->cache->get($cacheKey);
         }
 
         $response = $this->httpClient->request('get', $url, $this->getDefaultOptions());
@@ -72,7 +70,6 @@ class SearchApi
             throw new UnknownException(sprintf('Search return an http error : %s', $response->getStatusCode()));
         }
         if($response->getStatusCode() === 422) {
-            //@todo should be improve
             $this->logger->error('Validation error', ['http_content' => $content]);
 
             throw new ValidationException();
@@ -142,7 +139,6 @@ class SearchApi
             throw new UnknownException(sprintf('Search return an http error : %s', $response->getStatusCode()));
         }
         if($response->getStatusCode() === 422) {
-            //@todo should be improve
             $this->logger->error('Validation error', ['http_content' => $content]);
 
             throw new ValidationException();
@@ -157,23 +153,10 @@ class SearchApi
      */
     private function getDefaultOptions(): array
     {
-        $data = [
-            'headers' => $this->getDefaultHeaders(),
-        ];
-
-        return $data;
-    }
-
-    /**
-     * @return array
-     */
-    private function getDefaultHeaders(): array
-    {
-        //Force the use of user agent on each http client no matter they come
         return [
-            'User-Agent' => 'SDK PHP - ' . $this->userAgent,
+            'headers' => [
+                'User-Agent' => 'SDK PHP - ' . $this->userAgent,
+            ]
         ];
     }
-
-
 }

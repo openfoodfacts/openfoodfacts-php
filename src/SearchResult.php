@@ -4,13 +4,11 @@ namespace OpenFoodFacts;
 
 use OpenFoodFacts\Document\SearchDocument;
 
-/**
- * @phpstan-implements \Iterator<number, SearchDocument>
- */
-class SearchResult implements \Iterator
+class SearchResult
 {
     /** @var array<int, SearchDocument> */
-    private array $listDocuments;
+    public array $listDocuments;
+
     public readonly int $count;
     /** @var bool if false, the value is just an approximation @todo to check */
     public readonly bool $isCountExact;
@@ -38,7 +36,6 @@ class SearchResult implements \Iterator
         $this->pageCount = $content['page_count'] ?? 0;
         $this->aggregations = $content['aggregations'] ?? null;
 
-
         $this->debug = $content['debug'] ?? [];
         $this->took = $content['took'] ?? 0;
         $this->timedOut = $content['timed_out'] ?? false;
@@ -48,49 +45,5 @@ class SearchResult implements \Iterator
             fn (array $item) => new SearchDocument($item),
             $content['hits'] ?? []
         );
-
-    }
-
-
-    /**
-     * Implementation of Iterator
-     */
-
-    /**
-     * @inheritDoc
-     */
-    public function rewind(): void
-    {
-        reset($this->listDocuments);
-    }
-    /**
-     * @inheritDoc
-     */
-    public function current(): Document|false
-    {
-        return current($this->listDocuments);
-    }
-    /**
-     * @inheritDoc
-     */
-    public function key(): int|null
-    {
-        return key($this->listDocuments);
-    }
-    /**
-     * @inheritDoc
-     */
-    public function next(): void
-    {
-        next($this->listDocuments);
-    }
-    /**
-     * @inheritDoc
-     */
-    public function valid(): bool
-    {
-        $key = key($this->listDocuments);
-
-        return ($key !== null && $key !== false);
     }
 }

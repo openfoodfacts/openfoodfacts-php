@@ -12,7 +12,7 @@ class ApiTest extends TestCase
     {
         $this->expectException(BadRequestException::class);
         $this->expectExceptionMessage('not Available yet');
-        $api = new Api('product');
+        $api = new Api('Integration test', 'product');
         $api->uploadImage('unknown', 'foo', 'bar');
     }
 }

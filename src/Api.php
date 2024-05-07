@@ -120,6 +120,7 @@ class Api
      * @param CacheInterface|null $cacheInterface
      */
     public function __construct(
+        public readonly string $userAgent,
         private readonly string $currentAPI = 'food',
         string $geography = 'world',
         ?LoggerInterface $logger = null,
@@ -364,7 +365,14 @@ class Api
         $url        = $this->buildUrl('data', self::FILE_TYPE_MAP[$fileType]);
 
         try {
-            $response = $this->httpClient->request('get', $url, ['sink' => $filePath]);
+            $response = $this->httpClient->request(
+                'get',
+                $url,
+                [
+                    'sink' => $filePath,
+                    'headers' => $this->getDefaultHeaders()
+                ]
+            );
         } catch (GuzzleException $guzzleException) {
             $this->logger->warning(sprintf('OpenFoodFact - fetch - failed - GET : %s', $url), ['exception' => $guzzleException]);
             $exception = new BadRequestException($guzzleException->getMessage(), $guzzleException->getCode(), $guzzleException);
@@ -400,17 +408,13 @@ class Api
 
             return $cachedResult;
         }
+        $data = $this->getDefaultOptions();
 
-        $data = [
-            'on_stats' => function (TransferStats $stats) use (&$realUrl) {
-                // this function help to find redirection
-                // On redirect we lost some parameters like page
-                $realUrl = (string)$stats->getEffectiveUri();
-            }
-        ];
-        if ($this->auth) {
-            $data['auth'] = array_values($this->auth);
-        }
+        $data['on_stats'] = function (TransferStats $stats) use (&$realUrl) {
+            // this function help to find redirection
+            // On redirect we lost some parameters like page
+            $realUrl = (string)$stats->getEffectiveUri();
+        };
 
         try {
             $response = $this->httpClient->request('get', $url, $data);
@@ -447,10 +451,8 @@ class Api
      */
     private function fetchPost(string $url, array $postData, bool $isMultipart = false): array
     {
-        $data = [];
-        if ($this->auth) {
-            $data['auth'] = array_values($this->auth);
-        }
+        $data = $this->getDefaultOptions();
+
         if ($isMultipart) {
             foreach ($postData as $key => $value) {
                 $data['multipart'][] = [
@@ -491,7 +493,7 @@ class Api
      * This private function generates an url according to the parameters
      * @param  string|null $service
      * @param  string|array|null $resourceType
-     * @param  integer|string|array|null $parameters
+     * @param  int|string|array|null $parameters
      * @return string               the generated url
      */
     private function buildUrl(string $service = null, $resourceType = null, $parameters = null): string
@@ -538,11 +540,10 @@ class Api
                     $resourceType = implode('/', ['state',  'ingredients-completed']);
                     $parameters   = 1;
                 }
-                /** @phpstan-ignore-next-line */
                 $baseUrl = implode('/', array_filter([
                     $this->geoUrl,
                     $resourceType,
-                    $parameters
+                    is_array($parameters) ? '' : $parameters
                 ], function ($value) {
                     return !empty($value);
                 }));
@@ -552,4 +553,32 @@ class Api
 
         return $baseUrl;
     }
+
+    /**
+     * @return array
+     */
+    private function getDefaultOptions(): array
+    {
+        $data = [
+            'headers' => $this->getDefaultHeaders(),
+        ];
+        if ($this->auth) {
+            $data['auth'] = array_values($this->auth);
+        }
+
+        return $data;
+    }
+
+    /**
+     * @return array
+     */
+    private function getDefaultHeaders(): array
+    {
+        //Force the use of user agent on each http client no matter they come
+        return [
+            'User-Agent' => 'SDK PHP - ' . $this->userAgent,
+        ];
+    }
+
+
 }

@@ -48,4 +48,4 @@ jobs:
       - name: Execute phpstan
         run: vendor/bin/phpstan
       - name: Execute tests
-        run: vendor/bin/phpunit --verbose
+        run: vendor/bin/phpunit

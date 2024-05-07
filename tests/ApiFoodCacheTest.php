@@ -3,8 +3,8 @@
 namespace OpenFoodFactsTests;
 
 use GuzzleHttp;
-use OpenFoodFacts\FilesystemTrait;
 use OpenFoodFacts\Api;
+use OpenFoodFacts\FilesystemTrait;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Psr16Cache;
 
@@ -29,15 +29,10 @@ class ApiFoodCacheTest extends ApiFoodTest
             // "http_errors" => false, // MUST not use as it crashes error handling
             'Connection' => 'close',
             CURLOPT_FORBID_REUSE => true,
-            CURLOPT_FRESH_CONNECT => true,
-            'defaults' => [
-                'headers' => [
-                    'CURLOPT_USERAGENT' => 'OFF - PHP - SDK - Unit Test',
-                ],
-            ],
+            CURLOPT_FRESH_CONNECT => true
         ]);
 
-        $api = new Api('food', 'fr-en', $this->log, $httpClient, $cache);
+        $api = new Api('Integration test', 'food', 'fr-en', $this->log, $httpClient, $cache);
         $this->assertInstanceOf(Api::class, $api);
         $this->api = $api;
     }

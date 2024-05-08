@@ -10,6 +10,7 @@ use OpenFoodFacts\Exception\NotFoundException;
 use OpenFoodFacts\Exception\ProductNotFoundException;
 use OpenFoodFacts\Exception\UnknownException;
 use OpenFoodFacts\Exception\ValidationException;
+use OpenFoodFacts\Model\AutocompleteResult;
 use OpenFoodFacts\Model\SearchResult;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -136,13 +137,13 @@ class SearchApi
      * @param int|null $size Number of results to return.
      * @param string|null $fuzziness Fuzziness level to use, default to no fuzziness.
      * @param string|null $indexId Index ID to use for the search, if not provided, the default index is used. If there is only one index, this parameter is not needed.
-     * @return array not documented
+     * @return AutocompleteResult
      * @throws InvalidParameterException
      * @throws NotFoundException
      * @throws UnknownException
      * @throws ValidationException
      */
-    public function autocomplete(string $query, array $taxonomyNames, string $lang = null, int $size = null, string $fuzziness = null, string $indexId = null): array
+    public function autocomplete(string $query, array $taxonomyNames, string $lang = null, int $size = null, string $fuzziness = null, string $indexId = null): AutocompleteResult
     {
         if(empty($query) || empty($taxonomyNames)) {
             throw new InvalidParameterException('query ans taxonomyNames must be provided');
@@ -167,7 +168,7 @@ class SearchApi
 
         $url = sprintf('https://search.openfoodfacts.org/autocomplete?%s', http_build_query($parameters));
 
-        return $this->request('get', $url);
+        return new AutocompleteResult($this->request('get', $url));
     }
 
 

@@ -22,4 +22,11 @@ class SearchApiTest extends TestCase
         $result = $api->getDocument('3222475591327');
         $this->assertEquals(SearchDocument::class, get_class($result));
     }
+
+    public function testAutocompleteFunction(): void
+    {
+        $api = new SearchApi('Integration test');
+        $result = $api->autocomplete('chocolat', ['name']);
+        $this->assertIsArray($result);
+    }
 }

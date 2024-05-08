@@ -41,17 +41,20 @@ class SearchApi
 
 
     /**
-     * this function search an Document by barcode
-     * @param string $identifier the barcode [\d]{13}
-     * @return SearchDocument         A Document if found
+     * Function to find a document by him identifier
+     * @param string $identifier
+     * @param string|null $indexId Index ID to use for the search, if not provided, the default index is used. If there is only one index, this parameter is not needed.
+     * @return SearchDocument A Document if found
      * @throws InvalidArgumentException
      * @throws ProductNotFoundException
      * @throws UnknownException
      * @throws ValidationException
      */
-    public function getDocument(string $identifier): SearchDocument
+    public function getDocument(string $identifier, string $indexId = null): SearchDocument
     {
-        $url = "https://search.openfoodfacts.org/document/$identifier";
+        $params = isset($indexId) ? ['index_id' => $indexId] : [];
+
+        $url = "https://search.openfoodfacts.org/document/$identifier?" . http_build_query($params);
 
         $cacheKey   = hash('sha256', $url);
         if (!empty($this->cache) && $this->cache->has($cacheKey)) {
@@ -75,7 +78,8 @@ class SearchApi
 
 
     /**
-     * The new search function )
+     * Function to search a list of products
+     *
      * @param string|null $query The search query, it supports Lucene search query syntax (https://lucene.apache.org/core/3_6_0/queryparsersyntax.html). Words that are not recognized by the lucene query parser are searched as full text search.
      * Example: categories_tags:"en:beverages" strawberry brands:"casino" query use a filter clause for categories and brands and look for "strawberry" in multiple fields.
      * The query is optional, but sort_by value must then be provided.
@@ -130,10 +134,10 @@ class SearchApi
 
 
     /**
-     * The new search function )
+     * Autocomplete function to search for a term in a taxonomy
      * @param string $query User autocomplete query.
-     * @param string[] $taxonomyNames Name(s) of the taxonomy to search in
-     * @param string|null $lang Language to search in.
+     * @param string[] $taxonomyNames Name(s) of the taxonomy to search in.
+     * @param string|null $lang Language to search in, default to en.
      * @param int|null $size Number of results to return.
      * @param string|null $fuzziness Fuzziness level to use, default to no fuzziness.
      * @param string|null $indexId Index ID to use for the search, if not provided, the default index is used. If there is only one index, this parameter is not needed.

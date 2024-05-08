@@ -4,6 +4,7 @@ namespace OpenFoodFacts;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Exception\GuzzleException;
 use OpenFoodFacts\Document\SearchDocument;
 use OpenFoodFacts\Exception\InvalidParameterException;
 use OpenFoodFacts\Exception\NotFoundException;
@@ -49,6 +50,7 @@ class SearchApi
      * @throws ProductNotFoundException
      * @throws UnknownException
      * @throws ValidationException
+     * @throws GuzzleException
      */
     public function getDocument(string $identifier, string $indexId = null): SearchDocument
     {
@@ -96,6 +98,7 @@ class SearchApi
      * @throws NotFoundException
      * @throws UnknownException
      * @throws ValidationException
+     * @throws GuzzleException
      */
     public function search(string $query = null, array $langs = null, int $pageSize = null, int $page = null, array $fields = null, string $sortBy = null, string $indexId = null): SearchResult
     {
@@ -146,6 +149,7 @@ class SearchApi
      * @throws NotFoundException
      * @throws UnknownException
      * @throws ValidationException
+     * @throws GuzzleException
      */
     public function autocomplete(string $query, array $taxonomyNames, string $lang = null, int $size = null, string $fuzziness = null, string $indexId = null): AutocompleteResult
     {
@@ -176,6 +180,12 @@ class SearchApi
     }
 
 
+    /**
+     * @throws ValidationException
+     * @throws NotFoundException
+     * @throws UnknownException
+     * @throws GuzzleException
+     */
     private function request(string $method, string $url): array
     {
         $response = $this->httpClient->request($method, $url, $this->getDefaultOptions());

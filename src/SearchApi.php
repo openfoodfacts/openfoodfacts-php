@@ -142,7 +142,7 @@ class SearchApi
      * @param string[] $taxonomyNames Name(s) of the taxonomy to search in.
      * @param string|null $lang Language to search in, default to en.
      * @param int|null $size Number of results to return.
-     * @param string|null $fuzziness Fuzziness level to use, default to no fuzziness.
+     * @param int|null $fuzziness Fuzziness level to use, default to no fuzziness.
      * @param string|null $indexId Index ID to use for the search, if not provided, the default index is used. If there is only one index, this parameter is not needed.
      * @return AutocompleteResult
      * @throws InvalidParameterException
@@ -151,7 +151,7 @@ class SearchApi
      * @throws ValidationException
      * @throws GuzzleException
      */
-    public function autocomplete(string $query, array $taxonomyNames, string $lang = null, int $size = null, string $fuzziness = null, string $indexId = null): AutocompleteResult
+    public function autocomplete(string $query, array $taxonomyNames, string $lang = null, int $size = null, int $fuzziness = null, string $indexId = null): AutocompleteResult
     {
         if(empty($query) || empty($taxonomyNames)) {
             throw new InvalidParameterException('query ans taxonomyNames must be provided');

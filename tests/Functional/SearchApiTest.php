@@ -21,6 +21,7 @@ class SearchApiTest extends TestCase
 {
     private const USER_AGENT = 'Integration test';
     private const URL_DOCUMENT = 'https://search.openfoodfacts.org/document/3222475591327?index_id=index';
+    private const DOCUMENT_BARCODE = '3222475591327';
     private function getInstance(
         LoggerInterface $logger,
         ClientInterface $client,
@@ -47,7 +48,7 @@ class SearchApiTest extends TestCase
         );
 
         $this->expectException(ProductNotFoundException::class);
-        $instance->getDocument('3222475591327', 'index');
+        $instance->getDocument(self::DOCUMENT_BARCODE, 'index');
     }
 
 
@@ -71,7 +72,7 @@ class SearchApiTest extends TestCase
         );
 
         $this->expectException(ValidationException::class);
-        $instance->getDocument('3222475591327', 'index');
+        $instance->getDocument(self::DOCUMENT_BARCODE, 'index');
     }
 
 
@@ -94,7 +95,7 @@ class SearchApiTest extends TestCase
         );
 
         $this->expectException(UnknownException::class);
-        $instance->getDocument('3222475591327', 'index');
+        $instance->getDocument(self::DOCUMENT_BARCODE, 'index');
     }
 
 
@@ -105,7 +106,7 @@ class SearchApiTest extends TestCase
     {
         $response = [
             'last_indexed_datetime' => '2024-02-29T09:55:42.238198',
-            'code' => '3222475591327',
+            'code' => self::DOCUMENT_BARCODE,
             'product_name' => [
                 'main' => 'Tartelettes pur beurre fraise'
             ],
@@ -122,14 +123,15 @@ class SearchApiTest extends TestCase
         $cache
             ->expects($this->once())
             ->method('set')
-            ->with($cacheKey, new SearchDocument($response));
+            ->with($cacheKey, new SearchDocument($response))
         ;
+
         $instance = $this->getInstance(
             new NullLogger(),
             $this->getClient(self::URL_DOCUMENT, new Response(200, [], json_encode($response))),
             $cache
         );
-        $result = $instance->getDocument('3222475591327', 'index');
+        $result = $instance->getDocument(self::DOCUMENT_BARCODE, 'index');
         $this->assertEquals(SearchDocument::class, get_class($result));
     }
 

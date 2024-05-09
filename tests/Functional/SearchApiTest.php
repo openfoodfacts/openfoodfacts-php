@@ -67,7 +67,7 @@ class SearchApiTest extends TestCase
 
         $instance = $this->getInstance(
             $logger,
-            $this->getClient(self::URL_DOCUMENT, new Response(422, [], json_encode('content'))),
+            $this->getClient(self::URL_DOCUMENT, new Response(422, [], (string) json_encode('content'))),
             null
         );
 
@@ -90,7 +90,7 @@ class SearchApiTest extends TestCase
 
         $instance = $this->getInstance(
             $logger,
-            $this->getClient(self::URL_DOCUMENT, new Response(500, [], json_encode('content'))),
+            $this->getClient(self::URL_DOCUMENT, new Response(500, [], (string) json_encode('content'))),
             null
         );
 
@@ -128,7 +128,7 @@ class SearchApiTest extends TestCase
 
         $instance = $this->getInstance(
             new NullLogger(),
-            $this->getClient(self::URL_DOCUMENT, new Response(200, [], json_encode($response))),
+            $this->getClient(self::URL_DOCUMENT, new Response(200, [], (string) json_encode($response))),
             $cache
         );
         $result = $instance->getDocument(self::DOCUMENT_BARCODE, 'index');
@@ -179,7 +179,7 @@ class SearchApiTest extends TestCase
 
         $instance = $this->getInstance(
             new NullLogger(),
-            $this->getClient($url, new Response(200, [], json_encode($response))),
+            $this->getClient($url, new Response(200, [], (string) json_encode($response))),
             null
         );
         $result = $instance->search('tomato', ['en', 'fr'], 10, 1, ['code'], 'code', 'off');
@@ -206,7 +206,7 @@ class SearchApiTest extends TestCase
 
         $instance = $this->getInstance(
             new NullLogger(),
-            $this->getClient($url, new Response(200, [], json_encode($response))),
+            $this->getClient($url, new Response(200, [], (string) json_encode($response))),
             null
         );
         $result = $instance->autocomplete('carre', ['brand'], 'en', 10, 0, 'off');

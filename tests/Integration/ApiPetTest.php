@@ -1,6 +1,6 @@
 <?php
 
-namespace OpenFoodFactsTests;
+namespace OpenFoodFactsTests\Integration;
 
 use OpenFoodFacts\Api;
 use OpenFoodFacts\Collection;
@@ -8,6 +8,7 @@ use OpenFoodFacts\Document;
 use OpenFoodFacts\Document\PetDocument;
 use OpenFoodFacts\Exception\BadRequestException;
 use OpenFoodFacts\FilesystemTrait;
+use OpenFoodFactsTests\Helper;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 

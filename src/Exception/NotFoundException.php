@@ -4,6 +4,6 @@ namespace OpenFoodFacts\Exception;
 
 use Exception;
 
-class BadRequestException extends Exception
+class NotFoundException extends Exception
 {
 }

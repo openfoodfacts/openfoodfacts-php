@@ -7,7 +7,7 @@ namespace OpenFoodFacts;
  */
 class Collection implements \Iterator
 {
-    public const defaultPageSize = 24;
+    public const defaultPageSize = 20;
 
     /** @var array<int, Document> */
     private array $listDocuments  = [];

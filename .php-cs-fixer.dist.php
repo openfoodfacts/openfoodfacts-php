@@ -17,5 +17,4 @@ return $config
         'no_unused_imports' => true,
         'ternary_operator_spaces' => true,
     ])
-    ->setUsingCache(false)
-    ;
+    ->setUsingCache(false);

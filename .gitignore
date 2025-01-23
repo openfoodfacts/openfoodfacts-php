@@ -12,8 +12,11 @@
 # You may choose to ignore a library lock file https://getcomposer.org/doc/02-libraries.md#lock-file
 composer.lock
 
-## Temporary test files
+# doc files
+/doc/*
+!/doc/home.md
 
+## Temporary test files
 /tests/tmp/*
 ## Phpunit and cs-fixer cache file
 .phpunit.result.cache

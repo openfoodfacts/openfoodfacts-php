@@ -18,26 +18,38 @@ use Psr\Log\NullLogger;
 use Psr\SimpleCache\CacheInterface;
 use Psr\SimpleCache\InvalidArgumentException;
 
+/**
+ * Search api class is an interface for the api https://search.openfoodfacts.org/docs
+ *
+ * This class provide 3 methods for the search api :
+ * - getDocument : to find a document by him identifier
+ * - search : to search a list of products
+ * - autocomplete : to search for a term in a taxonomy
+ */
 class SearchApi
 {
+    /**
+     * @var CacheInterface|null a simple cache interface, it help you to add cache on getDocument function, Default : null
+     */
     private ?CacheInterface $cache;
 
 
     /**
-     * the constructor of the function
      * @param string $userAgent this parameter define an user agent
      * @param LoggerInterface $logger this parameter define an logger
-     * @param ClientInterface $httpClient
-     * @param CacheInterface|null $cacheInterface
+     * @param ClientInterface $httpClient this parameter define an http client
+     * @param CacheInterface|null $cacheInterface this parameter define a cache interface
      */
     public function __construct(
+        /** @var string The user agent is required for all http call (add to headers) */
         public readonly string $userAgent,
+        /** @var LoggerInterface The logger help to get information on error, Default : Psr\Log\NullLogger */
         public readonly LoggerInterface $logger = new NullLogger(),
+        /** @var ClientInterface The client interface help you to add your own client / configuration / middleware / cache, Default : GuzzleHttp\Client  */
         public readonly ClientInterface $httpClient = new Client(),
         ?CacheInterface $cacheInterface = null
     ) {
         $this->cache        = $cacheInterface;
-
     }
 
 

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<phpdocumentor configVersion="3">
+    <title>OpenFoodFact-PHP</title>
+    <paths>
+        <output>doc/</output>
+        <cache>build/cache</cache>
+    </paths>
+
+    <version number="latest">
+        <api>
+            <source dsn=".">
+                <path>src</path>
+            </source>
+            <visibility>public</visibility>
+            <default-package-name>OpenFoodFacts</default-package-name>
+            <markers>
+                <!-- Remove all marker -->
+                <marker>none</marker>
+            </markers>
+        </api>
+    </version>
+
+</phpdocumentor>

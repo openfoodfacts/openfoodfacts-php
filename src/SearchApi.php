@@ -102,30 +102,30 @@ class SearchApi
      */
     public function search(string $query = null, array $langs = null, int $pageSize = null, int $page = null, array $fields = null, string $sortBy = null, string $indexId = null): SearchResult
     {
-        if(empty($query) && empty($sortBy)) {
+        if (empty($query) && empty($sortBy)) {
             throw new InvalidParameterException('query or sortBy must be provided');
         }
         /** @var string[] $parameters */
         $parameters = [];
-        if(isset($query)) {
+        if (isset($query)) {
             $parameters['q'] = $query;
         }
-        if(isset($langs)) {
+        if (isset($langs)) {
             $parameters['langs'] = implode(',', $langs);
         }
-        if(isset($pageSize)) {
+        if (isset($pageSize)) {
             $parameters['page_size'] = $pageSize;
         }
-        if(isset($page)) {
+        if (isset($page)) {
             $parameters['page'] = $page;
         }
-        if(isset($fields)) {
+        if (isset($fields)) {
             $parameters['fields'] = implode(',', $fields);
         }
-        if(isset($sortBy)) {
+        if (isset($sortBy)) {
             $parameters['sort_by'] = $sortBy;
         }
-        if(isset($indexId)) {
+        if (isset($indexId)) {
             $parameters['index_id'] = $indexId;
         }
 
@@ -153,7 +153,7 @@ class SearchApi
      */
     public function autocomplete(string $query, array $taxonomyNames, string $lang = null, int $size = null, int $fuzziness = null, string $indexId = null): AutocompleteResult
     {
-        if(empty($query) || empty($taxonomyNames)) {
+        if (empty($query) || empty($taxonomyNames)) {
             throw new InvalidParameterException('query ans taxonomyNames must be provided');
         }
         /** @var string[] $parameters */
@@ -161,16 +161,16 @@ class SearchApi
             'q' => $query,
             'taxonomy_names' => implode(',', $taxonomyNames),
         ];
-        if(isset($lang)) {
+        if (isset($lang)) {
             $parameters['lang'] = $lang;
         }
-        if(isset($size)) {
+        if (isset($size)) {
             $parameters['size'] = $size;
         }
-        if(isset($fuzziness)) {
+        if (isset($fuzziness)) {
             $parameters['fuzziness'] = $fuzziness;
         }
-        if(isset($indexId)) {
+        if (isset($indexId)) {
             $parameters['index_id'] = $indexId;
         }
 

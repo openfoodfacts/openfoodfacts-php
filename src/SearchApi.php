@@ -21,6 +21,8 @@ use Psr\SimpleCache\InvalidArgumentException;
 class SearchApi
 {
     private ?CacheInterface $cache;
+    private LoggerInterface $logger;
+    private ClientInterface $httpClient;
 
 
     /**
@@ -32,11 +34,13 @@ class SearchApi
      */
     public function __construct(
         public readonly string $userAgent,
-        public readonly LoggerInterface $logger = new NullLogger(),
-        public readonly ClientInterface $httpClient = new Client(),
+        ?LoggerInterface $logger = null,
+        ?ClientInterface $httpClient = null,
         ?CacheInterface $cacheInterface = null
     ) {
-        $this->cache        = $cacheInterface;
+        $this->logger = $logger ?? new NullLogger();
+        $this->httpClient = $httpClient ?? new Client();
+        $this->cache = $cacheInterface;
 
     }
 

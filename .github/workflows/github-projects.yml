@@ -9,6 +9,7 @@ on:
     types:
       - opened
       - labeled
+permissions: {}
 jobs:
   add-to-project:
     name: Add issue to the relevant GitHub Project

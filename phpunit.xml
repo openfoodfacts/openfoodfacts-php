@@ -1,14 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.3/phpunit.xsd" backupGlobals="false" colors="true" bootstrap="vendor/autoload.php">
-  <coverage>
-    <report>
-      <clover outputFile="./build/logs/clover.xml"/>
-      <html outputDirectory="./build/coverrage"/>
-    </report>
-  </coverage>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/12.5/phpunit.xsd" backupGlobals="false" colors="true" bootstrap="vendor/autoload.php">
   <php>
     <ini name="error_reporting" value="-1"/>
-    <server name="KERNEL_CLASS" value="AppKernel"/>
   </php>
   <testsuites>
     <testsuite name="Unit test">
@@ -21,10 +14,6 @@
       <directory>tests/Integration</directory>
     </testsuite>
   </testsuites>
-  <logging>
-    <junit outputFile="./build/logs/junit.xml"/>
-    <testdoxHtml outputFile="./build/logstestdox.html"/>
-  </logging>
   <source>
     <include>
       <directory>src</directory>

@@ -4,11 +4,18 @@ includes:
 
 parameters:
   level: 8
-  checkMissingIterableValueType: false
   paths:
     - src
     - tests
   ignoreErrors:
+    # keep allowing untyped iterables (former checkMissingIterableValueType: false)
+    -
+      identifier: missingType.iterableValue
+    # tests deliberately assert at runtime what the type system already guarantees
+    -
+      identifier: method.alreadyNarrowedType
+      paths:
+        - tests
     -
       message: "#^Unreachable statement - code above always terminates.$#"
       path: tests/Integration/ApiFoodTest.php

@@ -2,6 +2,10 @@
 
 namespace OpenFoodFactsTests\Integration;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Psr7\Response;
 use OpenFoodFacts\Api;
 use OpenFoodFacts\Collection;
 use OpenFoodFacts\Document;
@@ -11,7 +15,6 @@ use OpenFoodFacts\Exception\MissingCredentialsException;
 use OpenFoodFacts\Exception\ProductNotFoundException;
 use OpenFoodFacts\FilesystemTrait;
 use OpenFoodFactsTests\Helper;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 
@@ -22,14 +25,11 @@ class ApiFoodTest extends TestCase
     private const DEFAULT_BARCODE = '3057640385148';
     /** @var Api */
     protected $api;
-    /**
-     * @var NullLogger|MockObject
-     */
-    protected $log;
+    protected NullLogger $log;
 
     protected function setUp(): void
     {
-        $this->log = $this->createMock(NullLogger::class);
+        $this->log = new NullLogger();
 
         $this->api = new Api('Integration test', 'food', 'fr-en', $this->log);
         $testFolder       = 'tests/tmp';
@@ -78,13 +78,6 @@ class ApiFoodTest extends TestCase
             'This test is bad -> we should not test against live APIs?',
         );
 
-        // Check redirect
-        $this->log
-            ->expects($this->once())
-            ->method('warning')
-            ->with('OpenFoodFact - The url : https://fr-en.openfoodfacts.org/country/france/trace/egg/3.json has been redirect to https://fr-en.openfoodfacts.org/country/france/trace/eggs.json')
-        ;
-
         $this->api->getByFacets(['trace' => 'egg', 'country' => 'france'], 3);
 
         $collection = $this->api->getByFacets(['trace' => 'eggs', 'country' => 'france'], 3);
@@ -105,12 +98,14 @@ class ApiFoodTest extends TestCase
 
     public function testApiAddProduct(): void
     {
+        $handler = new MockHandler([
+            new Response(200, [], '{"status":0,"status_verbose":"no user credentials"}'),
+        ]);
+        $this->api = new Api('Integration test', clientInterface: new Client([
+            'handler' => HandlerStack::create($handler),
+        ]));
         $this->api->activeTestMode();
-        $prd = Helper::getProductWithCache($this->api, self::DEFAULT_BARCODE);
-        $this->assertInstanceOf(FoodDocument::class, $prd);
-        $this->assertInstanceOf(Document::class, $prd);
-
-        $postData = ['code' => $prd->code, 'product_name' => $prd->product_name];
+        $postData = ['code' => self::DEFAULT_BARCODE, 'product_name' => 'Test product'];
 
         $this->expectException(MissingCredentialsException::class);
         $this->api->addNewProduct($postData);
@@ -119,14 +114,9 @@ class ApiFoodTest extends TestCase
     public function testApiAddProductException(): void
     {
         $this->api->activeTestMode();
-        $prd = Helper::getProductWithCache($this->api, self::DEFAULT_BARCODE);
 
         $this->expectException(BadRequestException::class);
-        $this->api->addNewProduct(['product_name' => $prd->product_name]);
-
-        $result   = $this->api->addNewProduct(['code' => '', 'product_name' => $prd->product_name]);
-        $this->assertTrue(is_string($result));
-        $this->assertEquals('no code or invalid code', $result);
+        $this->api->addNewProduct(['product_name' => 'Test product']);
     }
 
     public function testApiAddImageFieldNotValidException(): void

@@ -140,9 +140,11 @@ class SearchApiTest extends TestCase
      */
     public function testSearchFunctionNotEnoughParameter(): void
     {
+        $client = $this->createMock(ClientInterface::class);
+        $client->expects($this->never())->method('request');
         $instance = $this->getInstance(
             new NullLogger(),
-            $this->createMock(ClientInterface::class),
+            $client,
             null
         );
         $this->expectException(InvalidParameterException::class);

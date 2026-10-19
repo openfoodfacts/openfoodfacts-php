@@ -1,16 +1,17 @@
 {
   "name": "openfoodfacts/openfoodfacts-php",
-  "description": "Open Food Facts API Wrapper, the open database about food.",
+  "description": "Open Food Facts API Wrapper (API v3.6), the open database about food.",
   "homepage": "https://world.openfoodfacts.org/",
   "type": "library",
+  "keywords": ["openfoodfacts", "food", "nutrition", "api", "sdk", "open-data"],
   "minimum-stability": "stable",
   "license": "MIT",
-  "sort-packages": true,
   "support": {
     "email": "rmorenp@rampamster.org",
     "issues": "https://github.com/openfoodfacts/openfoodfacts-php/issues",
     "chat": "https://slack.openfoodfacts.org/",
-    "source": "https://github.com/openfoodfacts/openfoodfacts-php"
+    "source": "https://github.com/openfoodfacts/openfoodfacts-php",
+    "docs": "https://github.com/openfoodfacts/openfoodfacts-php/blob/develop/doc/home.md"
   },
   "authors": [
     {
@@ -23,28 +24,55 @@
       "name": "Colin Benoit",
       "homepage": "https://github.com/Benoit382",
       "role": "PHP Developer"
+    },
+    {
+      "name": "TaciteOFF",
+      "homepage": "https://github.com/TaciteOFF",
+      "role": "PHP Developer"
     }
   ],
+  "config": {
+    "sort-packages": true
+  },
+  "archive": {
+    "exclude": [
+      "/examples",
+      "/tests",
+      "/build",
+      "/vendor",
+      "/.github",
+      "/.gitattributes",
+      "/.gitignore",
+      "/composer.lock",
+      "/phpunit.xml",
+      "/phpstan.neon.dist",
+      "/.phpunit.result.cache",
+      ".DS_Store"
+    ]
+  },
   "require": {
     "php": "^8.1",
     "ext-json": "*",
-    "ext-curl": "*",
     "guzzlehttp/guzzle": "^7.4",
     "psr/log": "^3.0",
     "psr/simple-cache": "^3.0"
   },
   "autoload": {
     "psr-4": {
-      "OpenFoodFacts\\": "src/",
+      "OpenFoodFacts\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
       "OpenFoodFactsTests\\": "tests/"
     }
   },
   "require-dev": {
     "ext-gd": "*",
-    "symfony/cache": "^6.1.3",
-    "phpunit/phpunit": "^10.5",
-    "phpstan/phpstan": "^1.8.2",
-    "phpstan/phpstan-phpunit": "^1.1.1",
-    "friendsofphp/php-cs-fixer": "^3.9.5"
+    "friendsofphp/php-cs-fixer": "^3.9.5",
+    "phpstan/phpstan": "^2.1",
+    "phpstan/phpstan-phpunit": "^2.0",
+    "phpunit/phpunit": "^10.5 || ^11.5 || ^12.0",
+    "symfony/cache": "^6.4 || ^7.0"
   }
 }

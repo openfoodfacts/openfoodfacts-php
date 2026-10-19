@@ -129,8 +129,6 @@ class Collection implements \Iterator
      */
     public function valid(): bool
     {
-        $key = key($this->listDocuments);
-
-        return ($key !== null && $key !== false);
+        return key($this->listDocuments) !== null;
     }
 }

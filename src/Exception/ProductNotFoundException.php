@@ -2,8 +2,6 @@
 
 namespace OpenFoodFacts\Exception;
 
-use Exception;
-
-class ProductNotFoundException extends Exception
+class ProductNotFoundException extends NotFoundException
 {
 }

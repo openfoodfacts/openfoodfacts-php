@@ -20,7 +20,7 @@ class ApiPetTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->api = new Api('Integration test', 'pet', 'fr', $this->createMock(NullLogger::class));
+        $this->api = new Api('Integration test', 'pet', 'fr', new NullLogger());
 
         foreach (glob('tests/images/*') ?: [] as $file) {
             unlink($file);
@@ -40,10 +40,8 @@ class ApiPetTest extends TestCase
     public function testApiAddImage(): void
     {
         $this->expectException(BadRequestException::class);
-        $this->expectExceptionMessage('not Available yet');
+        $this->expectExceptionMessage('ImageField not valid!');
         $this->api->uploadImage('7613035799738', 'fronts', 'nothing');
-
-        $this->markTestSkipped('not Available yet');
     }
 
     public function testApiSearch(): void

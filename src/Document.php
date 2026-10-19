@@ -28,12 +28,15 @@ class Document
     }
 
     /**
+     * The product schema evolves over time (e.g. schema version 1004 / API v3.6
+     * removed the *_hierarchy and *_lc fields in favor of tags_sources), so a
+     * missing field returns null instead of raising a PHP warning.
      * @inheritDoc
      * @return mixed
      */
     public function __get(string $name)
     {
-        return $this->data[$name];
+        return $this->data[$name] ?? null;
     }
     /**
      * @inheritDoc

@@ -2,12 +2,18 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>OFF</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Open Food Facts — flat request example</title>
 </head>
 <body>
+<h1>Flat request (no SDK)</h1>
+<p>Reads a product over plain HTTP from the Open Food Facts API v3.6.
+   See <code>../01-basic_api_usage</code> for the same thing through the wrapper.</p>
 <form action="./request.php" method="get">
-    <input type="text" class="form-control" placeholder="barcode" name="ean13">
-    <input type="submit" name="Ok" value="Find this Barcode !">
+    <label for="ean13">Barcode</label>
+    <input type="text" id="ean13" name="ean13" inputmode="numeric" pattern="[0-9]{4,24}"
+           placeholder="3057640385148" value="3057640385148" required>
+    <button type="submit">Find this barcode!</button>
 </form>
 </body>
 </html>

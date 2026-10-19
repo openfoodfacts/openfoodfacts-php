@@ -3,15 +3,14 @@
 namespace OpenFoodFactsTests\Integration;
 
 use OpenFoodFacts\Api;
-use OpenFoodFacts\Exception\BadRequestException;
+use OpenFoodFacts\Exception\InvalidParameterException;
 use PHPUnit\Framework\TestCase;
 
 class ApiTest extends TestCase
 {
-    public function testUploadImageMustThrowAnExceptionForInvalidApi(): void
+    public function testUploadImageMustThrowAnExceptionForInvalidBarcode(): void
     {
-        $this->expectException(BadRequestException::class);
-        $this->expectExceptionMessage('not Available yet');
+        $this->expectException(InvalidParameterException::class);
         $api = new Api('Integration test', 'product');
         $api->uploadImage('unknown', 'foo', 'bar');
     }

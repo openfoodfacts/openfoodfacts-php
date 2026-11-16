@@ -73,7 +73,7 @@ public function getProduct(
 ```php
 $product = $api->getProduct('3057640385148', ['product_name', 'nutriscore_grade'], 'fr');
 echo $product->product_name;          // accès magique aux champs
-$all = $product->getData();           // tableau complet (trié récursivement)
+$all = $product->getData();           // tableau complet (clés triées récursivement, ordre des listes conservé)
 isset($product->brands);              // teste la présence d'un champ
 ```
 
@@ -191,7 +191,7 @@ foreach ($auto->options as $option) { echo $option->text; }
 
 ## Les modèles
 
-- **`Document`** (et ses spécialisations `FoodDocument`, `BeautyDocument`, `PetDocument`, `ProductDocument`, `SearchDocument`) : conteneur en lecture seule des données d'un produit. Accès magique (`$doc->product_name`), test de présence (`isset($doc->…)`), export trié (`$doc->getData()`). Champ absent → `null`.
+- **`Document`** (et ses spécialisations `FoodDocument`, `BeautyDocument`, `PetDocument`, `ProductDocument`, `SearchDocument`) : conteneur en lecture seule des données d'un produit. Accès magique (`$doc->product_name`), test de présence (`isset($doc->…)`), export aux clés triées récursivement (`$doc->getData()` ; l'ordre des listes est conservé). Champ absent → `null`.
 - **`Collection`** : liste paginée de `Document`, itérable (`foreach`). Méthodes : `pageCount()` (éléments de la page), `searchCount()` (total de la recherche), `getPage()`, `getPageSize()`, `getSkip()`.
 - **`Model\SearchResult`** : résultat de `SearchApi::search()` — propriétés publiques `count`, `isCountExact`, `page`, `pageSize`, `pageCount`, `listDocuments`, `aggregations`, `warning`, `took`, `timedOut`.
 - **`Model\AutocompleteResult`** / **`Model\AutocompleteOption`** : options d'autocomplétion (`id`, `text`, `taxonomy_name`).

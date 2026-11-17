@@ -191,6 +191,9 @@ class SearchApi
         if ($config === []) {
             $config = $this->getDefaultOptions();
         }
+        // Guzzle throws on 4xx/5xx by default, which would bypass the status
+        // code mapping below (e.g. 404 -> NotFoundException).
+        $config['http_errors'] = false;
         $response = $this->httpClient->request($method, $url, $config);
         $content = json_decode($response->getBody()->getContents(), true);
 

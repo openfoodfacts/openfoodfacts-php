@@ -134,4 +134,37 @@ class DocumentTest extends TestCase
 
         $this->assertSame($data, $doc->getData());
     }
+
+    public function testGetDataMustKeepTheOrderOfLists(): void
+    {
+        $data = [
+            'ingredients' => [
+                ['percent' => 60, 'id' => 'en:water'],
+                ['id' => 'en:apple', 'percent' => 40, 'vegan' => 'yes'],
+            ],
+            'categories_hierarchy' => ['en:plant-based-foods', 'en:beverages'],
+            '_keywords' => ['zero', 'cola', 'apple'],
+        ];
+
+        $doc = Document::createSpecificDocument('', $data);
+
+        $this->assertSame(
+            [
+                '_keywords' => ['zero', 'cola', 'apple'],
+                'categories_hierarchy' => ['en:plant-based-foods', 'en:beverages'],
+                'ingredients' => [
+                    ['id' => 'en:water', 'percent' => 60],
+                    ['id' => 'en:apple', 'percent' => 40, 'vegan' => 'yes'],
+                ],
+            ],
+            $doc->getData()
+        );
+    }
+
+    public function testGetDataMustStayJsonEncodableAsLists(): void
+    {
+        $doc = Document::createSpecificDocument('', ['tags' => ['b', 'a', 'c']]);
+
+        $this->assertSame('{"tags":["b","a","c"]}', json_encode($doc->getData()));
+    }
 }

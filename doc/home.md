@@ -73,7 +73,7 @@ public function getProduct(
 ```php
 $product = $api->getProduct('3057640385148', ['product_name', 'nutriscore_grade'], 'fr');
 echo $product->product_name;          // magic field access
-$all = $product->getData();           // full array (recursively sorted)
+$all = $product->getData();           // full array (map keys sorted recursively, list order preserved)
 isset($product->brands);              // check a field's presence
 ```
 
@@ -191,7 +191,7 @@ foreach ($auto->options as $option) { echo $option->text; }
 
 ## Models
 
-- **`Document`** (and its specializations `FoodDocument`, `BeautyDocument`, `PetDocument`, `ProductDocument`, `SearchDocument`): read-only container for product data. Magic access (`$doc->product_name`), presence check (`isset($doc->…)`), sorted export (`$doc->getData()`). Missing field → `null`.
+- **`Document`** (and its specializations `FoodDocument`, `BeautyDocument`, `PetDocument`, `ProductDocument`, `SearchDocument`): read-only container for product data. Magic access (`$doc->product_name`), presence check (`isset($doc->…)`), export with recursively sorted keys (`$doc->getData()`; list order is preserved). Missing field → `null`.
 - **`Collection`**: paginated list of `Document`, iterable (`foreach`). Methods: `pageCount()` (items on the page), `searchCount()` (total for the search), `getPage()`, `getPageSize()`, `getSkip()`.
 - **`Model\SearchResult`**: result of `SearchApi::search()` — public properties `count`, `isCountExact`, `page`, `pageSize`, `pageCount`, `listDocuments`, `aggregations`, `warning`, `took`, `timedOut`.
 - **`Model\AutocompleteResult`** / **`Model\AutocompleteOption`**: autocomplete options (`id`, `text`, `taxonomy_name`).

@@ -2,7 +2,10 @@
 
 namespace OpenFoodFactsTests\Functional;
 
+use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use OpenFoodFacts\Document\SearchDocument;
 use OpenFoodFacts\Exception\InvalidParameterException;
@@ -95,6 +98,35 @@ class SearchApiTest extends TestCase
         );
 
         $this->expectException(UnknownException::class);
+        $instance->getDocument(self::DOCUMENT_BARCODE, 'index');
+    }
+
+
+    /**
+     * Regression: with a real Guzzle client (http_errors enabled by default),
+     * error responses must still be mapped to the SDK exceptions.
+     * @return array<string, array{Response, class-string<\Throwable>}>
+     */
+    public static function provideErrorResponses(): array
+    {
+        return [
+            'not found (404)' => [new Response(404), ProductNotFoundException::class],
+            'validation error (422)' => [new Response(422, [], (string) json_encode('content')), ValidationException::class],
+            'server error (500)' => [new Response(500, [], (string) json_encode('content')), UnknownException::class],
+        ];
+    }
+
+    /**
+     * @param class-string<\Throwable> $expectedException
+     * @dataProvider provideErrorResponses
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideErrorResponses')]
+    public function testGetDocumentErrorsWithRealGuzzleClient(Response $response, string $expectedException): void
+    {
+        $client = new Client(['handler' => HandlerStack::create(new MockHandler([$response]))]);
+        $instance = $this->getInstance(new NullLogger(), $client, null);
+
+        $this->expectException($expectedException);
         $instance->getDocument(self::DOCUMENT_BARCODE, 'index');
     }
 
@@ -226,6 +258,7 @@ class SearchApiTest extends TestCase
                     'User-Agent' => 'SDK PHP - ' . self::USER_AGENT,
                 ],
                 'allow_redirects' => true,
+                'http_errors' => false,
             ])
             ->willReturn($response);
 

@@ -6,6 +6,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
 use OpenFoodFacts\Document\SearchDocument;
+use OpenFoodFacts\Exception\BadRequestException;
 use OpenFoodFacts\Exception\InvalidParameterException;
 use OpenFoodFacts\Exception\NotFoundException;
 use OpenFoodFacts\Exception\ProductNotFoundException;
@@ -49,6 +50,7 @@ class SearchApi
      * @throws InvalidArgumentException
      * @throws ProductNotFoundException
      * @throws UnknownException
+     * @throws BadRequestException
      * @throws ValidationException
      * @throws GuzzleException
      */
@@ -97,6 +99,7 @@ class SearchApi
      * @throws InvalidParameterException
      * @throws NotFoundException
      * @throws UnknownException
+     * @throws BadRequestException
      * @throws ValidationException
      * @throws GuzzleException
      */
@@ -148,6 +151,7 @@ class SearchApi
      * @throws InvalidParameterException
      * @throws NotFoundException
      * @throws UnknownException
+     * @throws BadRequestException
      * @throws ValidationException
      * @throws GuzzleException
      */
@@ -184,6 +188,7 @@ class SearchApi
      * @throws ValidationException
      * @throws NotFoundException
      * @throws UnknownException
+     * @throws BadRequestException
      * @throws GuzzleException
      */
     private function request(string $method, string $url, array $config = []): array
@@ -191,11 +196,18 @@ class SearchApi
         if ($config === []) {
             $config = $this->getDefaultOptions();
         }
+        // Guzzle throws on 4xx/5xx by default, which would bypass the status
+        // code mapping below (e.g. 404 -> NotFoundException).
+        $config['http_errors'] = false;
         $response = $this->httpClient->request($method, $url, $config);
         $content = json_decode($response->getBody()->getContents(), true);
 
         switch ($response->getStatusCode()) {
             case 200:
+                if (!is_array($content)) {
+                    throw new BadRequestException(sprintf('Search returned a non-JSON response (HTTP %d)', $response->getStatusCode()));
+                }
+
                 return $content;
             case 404:
                 throw new NotFoundException();

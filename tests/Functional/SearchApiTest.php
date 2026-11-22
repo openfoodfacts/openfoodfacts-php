@@ -2,9 +2,13 @@
 
 namespace OpenFoodFactsTests\Functional;
 
+use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use OpenFoodFacts\Document\SearchDocument;
+use OpenFoodFacts\Exception\BadRequestException;
 use OpenFoodFacts\Exception\InvalidParameterException;
 use OpenFoodFacts\Exception\ProductNotFoundException;
 use OpenFoodFacts\Exception\UnknownException;
@@ -96,6 +100,90 @@ class SearchApiTest extends TestCase
 
         $this->expectException(UnknownException::class);
         $instance->getDocument(self::DOCUMENT_BARCODE, 'index');
+    }
+
+
+    /**
+     * Regression: with a real Guzzle client (http_errors enabled by default),
+     * error responses must still be mapped to the SDK exceptions.
+     * @return array<string, array{Response, class-string<\Throwable>}>
+     */
+    public static function provideErrorResponses(): array
+    {
+        return [
+            'not found (404)' => [new Response(404), ProductNotFoundException::class],
+            'validation error (422)' => [new Response(422, [], (string) json_encode('content')), ValidationException::class],
+            'server error (500)' => [new Response(500, [], (string) json_encode('content')), UnknownException::class],
+        ];
+    }
+
+    /**
+     * @param class-string<\Throwable> $expectedException
+     * @dataProvider provideErrorResponses
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideErrorResponses')]
+    public function testGetDocumentErrorsWithRealGuzzleClient(Response $response, string $expectedException): void
+    {
+        $client = new Client(['handler' => HandlerStack::create(new MockHandler([$response]))]);
+        $instance = $this->getInstance(new NullLogger(), $client, null);
+
+        $this->expectException($expectedException);
+        $instance->getDocument(self::DOCUMENT_BARCODE, 'index');
+    }
+
+
+    /**
+     * Regression: a 200 response whose body is not a JSON object/array must
+     * raise BadRequestException instead of a TypeError.
+     * @return array<string, array{string}>
+     */
+    public static function provideNonJsonBodies(): array
+    {
+        return [
+            'html' => ['<html><body>Bad gateway</body></html>'],
+            'empty body' => [''],
+            'json scalar' => [(string) json_encode('content')],
+        ];
+    }
+
+    /**
+     * @dataProvider provideNonJsonBodies
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideNonJsonBodies')]
+    public function testGetDocumentNonJsonResponse(string $body): void
+    {
+        $instance = $this->getInstance(
+            new NullLogger(),
+            $this->getClient(self::URL_DOCUMENT, new Response(200, [], $body)),
+            null
+        );
+
+        $this->expectException(BadRequestException::class);
+        $instance->getDocument(self::DOCUMENT_BARCODE, 'index');
+    }
+
+    public function testSearchNonJsonResponse(): void
+    {
+        $instance = $this->getInstance(
+            new NullLogger(),
+            $this->getClient('https://search.openfoodfacts.org/search?q=tomato', new Response(200, [], 'not json')),
+            null
+        );
+
+        $this->expectException(BadRequestException::class);
+        $instance->search('tomato');
+    }
+
+    public function testAutocompleteNonJsonResponse(): void
+    {
+        $instance = $this->getInstance(
+            new NullLogger(),
+            $this->getClient('https://search.openfoodfacts.org/autocomplete?q=carre&taxonomy_names=brand', new Response(200, [], 'not json')),
+            null
+        );
+
+        $this->expectException(BadRequestException::class);
+        $instance->autocomplete('carre', ['brand']);
     }
 
 
@@ -226,6 +314,7 @@ class SearchApiTest extends TestCase
                     'User-Agent' => 'SDK PHP - ' . self::USER_AGENT,
                 ],
                 'allow_redirects' => true,
+                'http_errors' => false,
             ])
             ->willReturn($response);
 

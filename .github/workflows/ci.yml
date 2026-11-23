@@ -21,14 +21,14 @@ jobs:
         cancel-in-progress: true
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7
-      - uses: actions/cache@v6
+        uses: actions/checkout@v7.0.1
+      - uses: actions/cache@v6.1.0
         id: cache-db
         with:
           path: ~/.symfony/cache
           key: db
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@2.40.0
         with:
           php-version: ${{ matrix.php }}
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, gd
@@ -38,7 +38,7 @@ jobs:
         id: composer-cache
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
       - name: Cache dependencies
-        uses: actions/cache@v6
+        uses: actions/cache@v6.1.0
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: ${{ matrix.php }}-composer-${{ hashFiles('**/composer.lock') }}

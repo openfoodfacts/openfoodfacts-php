@@ -56,7 +56,11 @@ class SearchApi
     {
         $params = isset($indexId) ? ['index_id' => $indexId] : [];
 
-        $url = "https://search.openfoodfacts.org/document/$identifier?" . http_build_query($params);
+        $url = sprintf(
+            'https://search.openfoodfacts.org/document/%s?%s',
+            rawurlencode($identifier),
+            http_build_query($params)
+        );
 
         $cacheKey = hash('sha256', $url);
         if (!empty($this->cache) && $this->cache->has($cacheKey)) {
@@ -102,7 +106,7 @@ class SearchApi
      */
     public function search(?string $query = null, ?array $langs = null, ?int $pageSize = null, ?int $page = null, ?array $fields = null, ?string $sortBy = null, ?string $indexId = null): SearchResult
     {
-        if (empty($query) && empty($sortBy)) {
+        if (($query === null || $query === '') && ($sortBy === null || $sortBy === '')) {
             throw new InvalidParameterException('query or sortBy must be provided');
         }
         /** @var string[] $parameters */
@@ -153,7 +157,7 @@ class SearchApi
      */
     public function autocomplete(string $query, array $taxonomyNames, ?string $lang = null, ?int $size = null, ?int $fuzziness = null, ?string $indexId = null): AutocompleteResult
     {
-        if (empty($query) || empty($taxonomyNames)) {
+        if ($query === '' || $taxonomyNames === []) {
             throw new InvalidParameterException('query ans taxonomyNames must be provided');
         }
         /** @var string[] $parameters */

@@ -215,6 +215,82 @@ class SearchApiTest extends TestCase
         $this->assertEquals(AutocompleteResult::class, get_class($result));
     }
 
+    /**
+     * Identifiers containing reserved characters must be URL-encoded in the path
+     */
+    public function testGetDocumentEncodesIdentifier(): void
+    {
+        $url = 'https://search.openfoodfacts.org/document/a%2Fb%3Fc%23d?index_id=index';
+
+        $instance = $this->getInstance(
+            new NullLogger(),
+            $this->getClient($url, new Response(200, [], (string) json_encode(['code' => 'a/b?c#d']))),
+            null
+        );
+        $result = $instance->getDocument('a/b?c#d', 'index');
+        $this->assertEquals(SearchDocument::class, get_class($result));
+    }
+
+    /**
+     * The string '0' is a valid query and must not be treated as missing
+     */
+    public function testSearchAcceptsZeroQuery(): void
+    {
+        $response = ['hits' => [], 'page' => 1, 'page_size' => 10, 'page_count' => 0, 'count' => 0];
+        $url = 'https://search.openfoodfacts.org/search?q=0';
+
+        $instance = $this->getInstance(
+            new NullLogger(),
+            $this->getClient($url, new Response(200, [], (string) json_encode($response))),
+            null
+        );
+        $result = $instance->search('0');
+        $this->assertEquals(SearchResult::class, get_class($result));
+    }
+
+    /**
+     * An empty query without sortBy is still rejected
+     */
+    public function testSearchRejectsEmptyQueryWithoutSortBy(): void
+    {
+        $client = $this->createMock(ClientInterface::class);
+        $client->expects($this->never())->method('request');
+        $instance = $this->getInstance(new NullLogger(), $client, null);
+
+        $this->expectException(InvalidParameterException::class);
+        $instance->search('');
+    }
+
+    /**
+     * The string '0' is a valid autocomplete query and must not be treated as missing
+     */
+    public function testAutocompleteAcceptsZeroQuery(): void
+    {
+        $response = ['took' => 1, 'timed_out' => false, 'options' => []];
+        $url = 'https://search.openfoodfacts.org/autocomplete?q=0&taxonomy_names=brand';
+
+        $instance = $this->getInstance(
+            new NullLogger(),
+            $this->getClient($url, new Response(200, [], (string) json_encode($response))),
+            null
+        );
+        $result = $instance->autocomplete('0', ['brand']);
+        $this->assertEquals(AutocompleteResult::class, get_class($result));
+    }
+
+    /**
+     * Empty query or empty taxonomyNames are still rejected
+     */
+    public function testAutocompleteRejectsMissingParameters(): void
+    {
+        $client = $this->createMock(ClientInterface::class);
+        $client->expects($this->never())->method('request');
+        $instance = $this->getInstance(new NullLogger(), $client, null);
+
+        $this->expectException(InvalidParameterException::class);
+        $instance->autocomplete('', ['brand']);
+    }
+
     private function getClient(string $url, Response $response): ClientInterface
     {
         $client = $this->createMock(ClientInterface::class);
